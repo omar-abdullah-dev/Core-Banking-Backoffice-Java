@@ -18,7 +18,7 @@ import static com.omar.bank.util.NumberFormatter.timeFormatter;
 public class BankEmployeeCLI {
 
     private static final BankService bankService = BankService.getInstance();
-
+//TODO: Add Emplyee Login & Roles (Teller, Manager) → control access to certain operations (e.g. only manager can create customers/accounts)
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
 

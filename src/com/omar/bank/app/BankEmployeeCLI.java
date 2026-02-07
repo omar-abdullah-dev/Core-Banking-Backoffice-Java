@@ -18,7 +18,72 @@ import static com.omar.bank.util.NumberFormatter.timeFormatter;
 public class BankEmployeeCLI {
 
     private static final BankService bankService = BankService.getInstance();
-//TODO: Add Emplyee Login & Roles (Teller, Manager) → control access to certain operations (e.g. only manager can create customers/accounts)
+//TODO: Add Employee Login & Roles (Teller, Manager) → control access to certain operations
+// (e.g. only manager can create customers/accounts).
+
+// TODO: Define employee roles
+// - CS
+// - TELLER
+// - MANAGER
+// TODO: Create Employee model
+// - id
+// - username
+// - password
+// - name
+// - role (CS / TELLER / MANAGER)
+// - password verification method
+// TODO: Handle employee authentication
+// - Create AuthService
+// - Store employees with assigned roles (hardcoded)
+// - Implement login(username, password) -> Employee | null
+// TODO: Require employee login before showing main menu
+// - Show login screen at startup
+// - Block access until login succeeds
+// TODO: Store logged-in employee in session
+// - currentEmployee variable
+// - Display "Logged in as: <name> (<role>)"
+// TODO: Show menu options based on employee role
+// - CS: create customer, add account
+// - Teller: deposit, withdraw, view transactions
+// - Manager: all options
+// TODO: Enforce role-based access in service layer
+// - Validate role before executing operation
+// - Throw AccessDeniedException or show error message
+    // only CS or MANAGER can create customer
+// TODO: Track which employee performed the transaction
+// - Extend Transaction model
+// - Add field: performedBy (employee name or id)
+// TODO: Include employee context when performing transactions
+// - Pass currentEmployee to deposit / withdraw
+// - Save employee info in Transaction
+// TODO: Print transaction with employee information
+// - Show employee name and role
+// TODO: Add employee info to CSV export
+// - Add columns: PerformedBy, Role
+// - Keep export incremental (no duplicates)
+// TODO: Allow employee logout
+// - Add logout option
+// - Clear currentEmployee
+// - Redirect to login screen
+// TODO: Prevent operations without login
+// - Check currentEmployee != null
+// - Block all system actions otherwise
+
+
+    /*
+    * Implementation Sequence:
+        🟢 Recommended Execution Order
+            1️⃣ Role enum
+            2️⃣ Employee model
+            3️⃣ AuthService
+            4️⃣ Login flow
+            5️⃣ Session handling
+            6️⃣ Role-based menu
+            7️⃣ Role enforcement
+            8️⃣ Transaction ↔ Employee
+            9️⃣ Printer + CSV
+            🔟 Logout & safety
+    */
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
 

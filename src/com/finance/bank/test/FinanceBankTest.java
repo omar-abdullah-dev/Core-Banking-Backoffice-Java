@@ -65,11 +65,9 @@ public class FinanceBankTest {
 
 //            void df.format(amount);
         }
-
-
+         this.balanceEnquiry();
+         System.out.println();
     }
 //    Testing: notifyMail method (empty for now)
-    private void notifyMail(){
-
-    }
+    private void notifyMail(){}
 }

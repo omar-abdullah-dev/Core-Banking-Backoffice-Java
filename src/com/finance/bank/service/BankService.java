@@ -1,15 +1,15 @@
-package com.omar.bank.service;
+package com.finance.bank.service;
 
-import com.omar.bank.exception.*;
-import com.omar.bank.model.Account;
-import com.omar.bank.model.Customer;
-import com.omar.bank.util.IdGenerator;
-import com.omar.bank.util.NationalIdValidator;
+import com.finance.bank.exception.*;
+import com.finance.bank.model.Account;
+import com.finance.bank.model.Customer;
+import com.finance.bank.util.IdGenerator;
+import com.finance.bank.util.NationalIdValidator;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.omar.bank.util.AccountValidator.validateAccountNumber;
+import static com.finance.bank.util.AccountValidator.validateAccountNumber;
 
 
 public class BankService {

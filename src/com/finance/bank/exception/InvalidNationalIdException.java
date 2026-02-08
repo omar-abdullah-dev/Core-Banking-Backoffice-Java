@@ -1,4 +1,4 @@
-package com.omar.bank.exception;
+package com.finance.bank.exception;
 
 public class InvalidNationalIdException extends RuntimeException {
 

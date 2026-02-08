@@ -1,10 +1,10 @@
-package com.omar.bank.util;
+package com.finance.bank.util;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.omar.bank.exception.InvalidNationalIdException;
+import com.finance.bank.exception.InvalidNationalIdException;
 
 public final class NationalIdValidator {
 

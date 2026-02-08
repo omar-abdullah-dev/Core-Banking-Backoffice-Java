@@ -1,4 +1,4 @@
-package com.omar.bank.model;
+package com.finance.bank.model;
 
 public enum TransactionType {
     DEPOSIT("Deposit"),

@@ -1,8 +1,8 @@
-package com.omar.bank.util;
+package com.finance.bank.util;
 
-import com.omar.bank.exception.InvalidAccountException;
-import com.omar.bank.model.Account;
-import com.omar.bank.model.Customer;
+import com.finance.bank.exception.InvalidAccountException;
+import com.finance.bank.model.Account;
+import com.finance.bank.model.Customer;
 
 public final class AccountValidator {
     private AccountValidator() {}

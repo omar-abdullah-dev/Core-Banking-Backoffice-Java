@@ -1,6 +1,6 @@
-package com.omar.bank.model;
+package com.finance.bank.model;
 
-import com.omar.bank.util.NationalIdValidator;
+import com.finance.bank.util.NationalIdValidator;
 
 import static java.util.UUID.randomUUID;
 

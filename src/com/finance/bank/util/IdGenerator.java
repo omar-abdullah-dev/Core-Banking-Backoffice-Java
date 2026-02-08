@@ -1,6 +1,4 @@
-package com.omar.bank.util;
-
-import com.omar.bank.model.Customer;
+package com.finance.bank.util;
 
 import java.util.UUID;
 

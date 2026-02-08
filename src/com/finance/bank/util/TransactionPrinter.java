@@ -1,7 +1,7 @@
-package com.omar.bank.util;
+package com.finance.bank.util;
 
-import com.omar.bank.model.Account;
-import com.omar.bank.model.Transaction;
+import com.finance.bank.model.Account;
+import com.finance.bank.model.Transaction;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.time.Instant;
 import java.util.List;
 
-import static com.omar.bank.util.NumberFormatter.timeFormatter;
+import static com.finance.bank.util.NumberFormatter.timeFormatter;
 
 public final class TransactionPrinter {
     //  disable instantiation of utility class or objects

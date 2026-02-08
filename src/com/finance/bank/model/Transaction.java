@@ -1,6 +1,6 @@
-package com.omar.bank.model;
+package com.finance.bank.model;
 
-import com.omar.bank.util.IdGenerator;
+import com.finance.bank.util.IdGenerator;
 
 import java.math.BigDecimal;
 import java.time.Instant;

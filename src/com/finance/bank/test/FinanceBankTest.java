@@ -1,9 +1,9 @@
-package com.omar.bank.test;
+package com.finance.bank.test;
 
-import com.omar.bank.exception.InsufficientAmountException;
-import com.omar.bank.exception.InvalidAmountException;
+import com.finance.bank.exception.InsufficientAmountException;
+import com.finance.bank.exception.InvalidAmountException;
 
-import static com.omar.bank.util.NumberFormatter.amountFormatter;
+import static com.finance.bank.util.NumberFormatter.amountFormatter;
 
 public class FinanceBankTest {
     private double balance;

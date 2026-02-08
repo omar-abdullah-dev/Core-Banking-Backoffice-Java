@@ -1,8 +1,8 @@
-package com.omar.bank.model;
+package com.finance.bank.model;
 
-import com.omar.bank.exception.InsufficientAmountException;
-import com.omar.bank.exception.InvalidAccountException;
-import com.omar.bank.exception.InvalidAmountException;
+import com.finance.bank.exception.InsufficientAmountException;
+import com.finance.bank.exception.InvalidAccountException;
+import com.finance.bank.exception.InvalidAmountException;
 
 import java.math.BigDecimal;
 

@@ -1,4 +1,4 @@
-package com.omar.bank.util;
+package com.finance.bank.util;
 
 import java.text.DecimalFormat;
 import java.time.Instant;

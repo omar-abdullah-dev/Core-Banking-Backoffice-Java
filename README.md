@@ -1,12 +1,12 @@
-# 🏦 Banking Employee System — Java OOP
+# 🏦 Banking Employee System
 
-A **Banking Employee System** implemented in **Java**, following clean **Object-Oriented Programming (OOP)** principles and focusing on **robust validation and exception handling**.
+A **Banking Employee Back-Office System** implemented in **Java**, designed using **clean Object-Oriented Programming (OOP)** principles and a **layered architecture** with strong validation, exception handling, and audit-friendly design.
 
-This project simulates a **bank back-office system for employees**, allowing staff to manage customers, open accounts, perform deposits and withdrawals, and review transaction history through a **console-based (CLI) application**.
+This project simulates how **bank employees** manage customers, accounts, and transactions through a **console-based (CLI) application** with **authentication, authorization, transaction history, and CSV export**.
 
-> ⚠️ **Important Note**  
+> ⚠️ **Scope Notice**  
 > This system represents **employee-assisted banking operations only**.  
-> Customer self-service features (such as online transfers) are intentionally out of scope.
+> No customer self-service, online banking, or peer-to-peer transfers.
 
 ---
 
@@ -15,17 +15,21 @@ This project simulates a **bank back-office system for employees**, allowing sta
 ```
 exports/
 src/
-└── com/omar/bank/
+└── com/finance/bank/
     ├── app/
-    │   └── Main.java
+    │   └── BankEmployeeCLI.java
     │
     ├── exception/
+    │   ├── AccessDeniedException.java
+    │   ├── AuthenticationException.java
     │   ├── DuplicateAccountException.java
     │   ├── DuplicateNationalIdException.java
     │   ├── InsufficientAmountException.java
     │   ├── InvalidAccountException.java
     │   ├── InvalidAmountException.java
-    │   └── InvalidNationalIdException.java
+    │   ├── InvalidNationalIdException.java
+    │   ├── ResourceNotFoundException.java
+    │   └── UnauthorizedException.java
     │
     ├── model/
     │   ├── Account.java
@@ -33,233 +37,254 @@ src/
     │   ├── CurrentAccount.java
     │   ├── SavingsAccount.java
     │   ├── Customer.java
+    │   ├── Employee.java
     │   ├── Person.java
+    │   ├── Role.java
     │   ├── Transaction.java
     │   └── TransactionType.java
     │
+    ├── repository/
+    │   ├── AccountRepository.java
+    │   ├── CustomerRepository.java
+    │   └── TransactionRepository.java
+    │
     ├── service/
+    │   ├── AuthenticationService.java
+    │   ├── AuthorizationService.java
+    │   ├── AccountService.java
+    │   ├── CustomerService.java
+    │   ├── TransactionService.java
     │   └── BankService.java
     │
     └── util/
         ├── AccountValidator.java
         ├── IdGenerator.java
         ├── NationalIdValidator.java
-        └── NumberFormatter.java
+        ├── NumberFormatter.java
         └── TransactionPrinter.java
 ```
 
 ---
 
-## ⚙️ Main Features
+## 🧱 Architecture Overview
 
-### 🧑‍💼 Employee Operations (CLI)
+```
+CLI (Presentation)
+        ↓
+Services (Business Logic + Authorization)
+        ↓
+Repositories (In-Memory Persistence)
+        ↓
+Domain Models (Account, Customer, Transaction)
+```
 
-- **Create Customer**
-    - Validates Egyptian National ID
-    - Prevents duplicate customers
+### Layers
 
-- **Add Account**
-    - Savings Account
-    - Current Account with overdraft support
+- **Presentation Layer:** `BankEmployeeCLI`
+- **Service Layer:** Business logic & authorization
+- **Repository Layer:** In-memory data storage
+- **Domain Layer:** Core banking models
+- **Utility Layer:** Validation, formatting, ID generation, CSV export
 
-- **Deposit**
-    - Performed by employee after selecting customer and account
+### Design Principles Applied
 
-- **Withdraw**
-    - Supports overdraft rules for current accounts
-
-- **Show Customers**
-    - Displays customers and number of accounts
-
-- **Show Accounts by National ID**
-
-- **Show Transaction History**
-    - Read-only audit log per account
-    - Includes timestamps and balances
-    - Unique transaction IDs
-    - Formatted output for clarity
-- **Export Transaction History to File (CSV)**
-    - Saves transaction history to a text file
-    - Includes all transaction details
-    - File named with account number and timestamp
--  **Masked Account Numbers**
-    - Account numbers are never fully displayed
-    - Only the last 4 digits are visible (e.g. `XXXXXXXXXXXX3456`)
-    - Improves security and follows common banking standards
-
--  **Exit Application**
+- Separation of concerns
+- Encapsulation & abstraction
+- Polymorphism
+- Defensive copying
+- Singleton (`BankService`) as a composition root
+- Audit-friendly immutable transactions
 
 ---
 
-## 🇪🇬 Egyptian National ID Validation
+## 🔐 Authentication & Authorization
 
-Implemented via `NationalIdValidator`, including:
-- Format validation (14 digits)
-- Birthdate validation
+- Employee login (username/password)
+- Role-based access control:
+  - **CS (Customer Service):** Create customers, add accounts
+  - **TELLER:** Deposit, withdraw, view transactions
+  - **MANAGER:** Full access
+- Authorization enforced **inside the service layer**
+
+---
+
+## 👤 Customer Management
+
+- Create customers with **Egyptian National ID validation**
+- Prevent duplicate customers
+- List customers and account counts
+
+### 🇪🇬 Egyptian National ID Validation
+
+Handled by `NationalIdValidator`:
+
+- Length validation (14 digits)
+- Birthdate parsing and validation
 - Governorate code validation
 
 ---
 
-## 💳 Account Types
+## 💳 Account Management
 
 ### Savings Account
+
 - No overdraft
-- Withdrawals limited to available balance
+- Withdrawals limited to balance
 
 ### Current Account
-- Supports overdraft up to a defined limit
-- Overdraft usage is validated per withdrawal
+
+- Supports overdraft up to a configurable limit
+
+### Features
+
+- Multiple accounts per customer
+- Account numbers are:
+  - System-generated
+  - Masked in output (e.g., `XXXXXXXXXXXX3456`)
 
 ---
 
-## 📜 Transactions
+## 💰 Transactions
 
-Each **deposit** or **withdrawal** creates a `Transaction` record containing:
-- Transaction type
+### Supported Operations
+
+- **Deposit**
+- **Withdraw**
+
+Polymorphic business rules (Savings vs Current)
+
+### Transaction Record
+
+Each operation creates an **immutable Transaction record** containing:
+
+- Transaction type (`DEPOSIT` / `WITHDRAW`)
 - Amount
 - Balance after operation
 - Timestamp
 - Unique transaction ID
-
-Transactions are:
-- **Read-only**
-- Used for auditing and account history
-- Fully valid in an employee banking system
+- Performed-by employee (audit trail)
 
 ---
 
-## 📤 Transaction History Export (CSV)
-The system allows bank employees to export
-account transaction history to an Excel‑compatible CSV file.
+## 📜 Transaction History
 
-### Key Characteristics:
-- Export is performed **per account** (not per customer)
-- Files are generated using the account number
-- Existing files are **not overwritten**
-- Only **new transactions** are appended on each export
-- Prevents duplicate transaction records
-- Generated files can be opened directly using Microsoft Excel
-- No external libraries are required
-
-This feature simulates real-world **audit and reporting workflows**
-commonly found in core banking back-office systems.
+- Centralized in `TransactionRepository`
+- Source of truth (not stored in Account)
+- Read-only audit log
+- Sorted by timestamp (latest first)
+- Displayed in a clean, human-readable CLI format
 
 ---
+
+## 📤 CSV Export (Excel-Compatible)
+
+- Export transaction history **per account**
+- Files saved under `exports/`
+- Append-only (never overwritten)
+- Incremental export:
+  - Only new transactions are exported
+  - Prevents duplicate records
+- No external libraries required
+
+### CSV Format
+
+```csv
+Type,Amount,BalanceAfter,Timestamp,TransactionId
+DEPOSIT,1000.00,1000.00,2024-01-15T10:30:00,TXN001
+WITHDRAW,500.00,500.00,2024-01-15T14:20:00,TXN002
+```
+
+---
+
 ## 🔒 Security & Data Protection
-- Sensitive data such as account numbers are masked at display time
-- Only the last four digits of an account number are shown
-- Internal collections are exposed as read-only views
-- Transaction history is immutable and cannot be modified externally
+
+- Account numbers are masked in all outputs
+- Internal collections are returned as read-only views
+- Transactions are immutable after creation
+- Authorization enforced at the service layer
+
 ---
+
 ## ❗ Custom Exceptions
 
 | Exception | Purpose |
 |-----------|---------|
+| `AuthenticationException` | Invalid login credentials |
+| `UnauthorizedException` | Authenticated but lacks role |
+| `AccessDeniedException` | Explicit access denial |
 | `DuplicateNationalIdException` | Customer already exists |
 | `DuplicateAccountException` | Account number already exists |
-| `InvalidNationalIdException` | Invalid Egyptian national ID |
-| `InvalidAmountException` | Amount is zero or negative |
-| `InsufficientAmountException` | Balance or overdraft exceeded |
+| `InvalidNationalIdException` | Invalid Egyptian National ID |
+| `InvalidAmountException` | Amount ≤ 0 |
+| `InsufficientAmountException` | Balance/overdraft exceeded |
 | `InvalidAccountException` | Invalid or null account |
+| `ResourceNotFoundException` | Entity not found |
 
----
-
-## 🧠 Architecture Overview
-
-- **Presentation Layer:** CLI (`Main`)
-- **Service Layer:** `BankService` (Singleton)
-- **Domain Layer:** Accounts, Customers, Transactions
-- **Utility Layer:** Validators & Generators
-
-The system emphasizes:
-- Encapsulation
-- Separation of concerns
-- Domain-driven design
-- Clean error handling
-
----
-
-## 🧩 Design Decisions
-- Transaction exports are designed **per account** to align with
-  real-world banking audit and statement practices
-- CSV format was chosen to ensure Excel compatibility
-  without introducing external dependencies
-- Incremental export logic prevents duplicate transaction records
-  and avoids overwriting existing files
 ---
 
 ## 🚀 How to Run
 
 ### ▶️ Using an IDE
 
-1. Open the project in IntelliJ IDEA / Eclipse / VS Code
-2. Run:
-   ```
-   com.omar.bank.app.Main
-   ```
+Run:
+```
+com.finance.bank.app.BankEmployeeCLI
+```
 
 ### ▶️ Using Terminal
 
 ```bash
-javac src/com/omar/bank/app/Main.java
-java -cp src com.omar.bank.app.Main
+javac -d bin -sourcepath src src/com/finance/bank/app/BankEmployeeCLI.java
+java -cp bin com.finance.bank.app.BankEmployeeCLI
 ```
+
+**Recommended:** JDK 17+
 
 ---
 
-## 🔍 Example CLI Flow
+## 🧪 Test Coverage (Manual)
 
-```
-1 → Create Customer
-2 → Add Account
-5 → Deposit (select customer → select account)
-6 → Withdraw
-7 → Show Transaction History
-```
-
-The employee selects accounts using National ID, not raw account numbers, ensuring better UX and fewer errors.
-
----
-
-## 🧠 Concepts Demonstrated
-
-- Object-Oriented Programming (OOP)
-- Encapsulation & Abstraction
-- Inheritance & Polymorphism
-- Exception Handling
-- Input Validation
-- Singleton Pattern
-- Clean Architecture
-- Banking Domain Modeling
-- Defensive Copying & Unmodifiable Collections
-- Data Masking & Privacy‑Aware Output
-- Incremental File Export (Append‑Only CSV)
-
+- ✅ Login success/failure
+- ✅ Role enforcement
+- ✅ Create customer (valid/duplicate)
+- ✅ Add account (valid/invalid)
+- ✅ Deposit/withdraw:
+  - Valid
+  - Zero/negative
+  - Overdraft exceeded
+- ✅ Transaction history correctness
+- ✅ CSV export (first time/incremental)
+- ✅ Logout/Exit
 
 ---
 
-## 📌 Future Improvements
+## 📌 Project Status
 
-- Database persistence (H2 / MySQL / SQLite)
-- Employee authentication & roles
-- Account statements export
-- Logging (SLF4J / Log4j)
-- Unit testing (JUnit)
-- REST API or GUI version
+- ✅ Feature-complete
+- ✅ Architecturally sound
+- ✅ Bug-free (manually tested)
+- ✅ Interview-ready
+
+---
+
+## 🔮 Future Improvements
+
+- Database persistence (H2/PostgreSQL/MySQL)
+- Password hashing
+- Unit & integration testing (JUnit)
+- Logging (SLF4J)
+- REST API or GUI frontend
 
 ---
 
 ## 👨‍💻 Author
 
-**Omar Abdullah Moharam**  
-GitHub: [omarAbdullahMoharam](https://github.com/omarAbdullahMoharam)
+**Omar Abdullah Moharam**
 
-> This project was built for educational purposes to practice Java OOP, clean design, and realistic banking system architecture.
+GitHub: [omarAbdullahMoharam](https://github.com/omarAbdullahMoharam)
 
 ---
 
 ## 📄 License
-This project is open source and available for educational purposes.
 
-> This project emphasizes real-world banking logic,
-> clean design decisions, and production-like back-office workflows.
+Open-source and intended for educational purposes.

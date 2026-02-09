@@ -15,15 +15,16 @@ public class AuthenticationService {
     static {
         EMPLOYEES.add(
                 new Employee(
-                        "Omar CS",
-                        "omarPass!",
-                        "30212121700915",
+                        "omar",     // username
+                        "omarPass!",         // password
+                        "30212121700915",    // nationalId
                         Role.CS
                 )
         );
+
         EMPLOYEES.add(
                 new Employee(
-                        "Ahmed Manager",
+                        "ahmed",
                         "ahmedPass!",
                         "30111111700915",
                         Role.MANAGER
@@ -32,8 +33,8 @@ public class AuthenticationService {
 
         EMPLOYEES.add(
                 new Employee(
-                        "Mohamed Teller",
-                        "MohamedPass!",
+                        "mohamed",
+                        "mohamedPass!",
                         "30111111700916",
                         Role.TELLER
                 )
@@ -41,15 +42,23 @@ public class AuthenticationService {
     }
 
     /**
-     * Authenticates employee using username & password
+     * Authenticate employee using username & password
      */
     public Employee login(String username, String password) {
+
+        if (username == null || password == null) {
+            throw new AuthenticationException("Username and password are required");
+        }
+
+        username = username.trim();
+
         for (Employee employee : EMPLOYEES) {
             if (employee.getUserName().equals(username)
                     && employee.matchesPassword(password)) {
                 return employee;
             }
         }
+
         throw new AuthenticationException("Invalid username or password");
     }
 }

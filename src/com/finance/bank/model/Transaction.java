@@ -78,5 +78,16 @@ public class Transaction {
     public String getAccountNumber() {
         return accountNumber;
     }
+    public String getPerformedByEmployeeId() {
+        return performedByEmployeeId;
+    }
+
+    public String getPerformedByEmployeeName() {
+        return performedByEmployeeName;
+    }
+    public Role getPerformedByRole() {
+        return performedByRole;
+    }
+
 
 }

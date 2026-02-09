@@ -52,7 +52,6 @@ src/
     │   ├── AuthenticationService.java
     │   ├── AuthorizationService.java
     │   ├── AccountService.java
-    │   ├── CustomerService.java
     │   ├── TransactionService.java
     │   └── BankService.java
     │

@@ -17,24 +17,32 @@ import static com.finance.bank.util.AccountValidator.validateAccountNumber;
 
 
 public class BankService {
-    private final Map<String, Customer> customersByNationalId = new HashMap<>();
-    private final Map<String, Account> accountsByNumber = new HashMap<>();
 
+    private final Map<String, Customer> customersByNationalId = new HashMap<>();
+
+    // repositories
+    private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
 
-    private final TransactionService transactionService;
+    // services
     private final AuthorizationService authorizationService;
+    private final AccountService accountService;
+    private final TransactionService transactionService;
+
+    private static final BankService INSTANCE = new BankService();
+
 
 
     private BankService() {
 
         // repositories
+        this.accountRepository = new AccountRepository();
         this.transactionRepository = new TransactionRepository();
-        AccountRepository accountRepository = new AccountRepository();
 
-        // services
-        AuthorizationService authorizationService = new AuthorizationService();
-        AccountService accountService = new AccountService(authorizationService, accountRepository);
+        // services (single instances)
+        this.authorizationService = new AuthorizationService();
+        this.accountService =
+                new AccountService(authorizationService, accountRepository);
 
         this.transactionService =
                 new TransactionService(
@@ -42,9 +50,8 @@ public class BankService {
                         accountService,
                         transactionRepository
                 );
-        this.authorizationService = new AuthorizationService();
-
     }
+
     private static class BankServiceHolder {
         private static final BankService INSTANCE = new BankService();
     }
@@ -104,8 +111,12 @@ public class BankService {
          * “I refactored account storage from a List to a Map keyed
          * by account number to ensure constant‑time lookups
          * and enforce uniqueness at the data‑structure level.”
+         *
+         * NOTE:
+         * The repository is the single source of truth.
+         * Today it is in‑memory, tomorrow it can be a database.
          */
-        if (accountsByNumber.containsKey(accNum)) {
+        if (accountRepository.exists(accNum)) {
             throw new DuplicateAccountException(
                     "Account with this account number already exists"
             );
@@ -124,11 +135,12 @@ public class BankService {
         }
 
         // persist
-        // - save account in central accounts map
-        // - attach account to its owning customer
-        accountsByNumber.put(accNum, account);
+        // - save account using repository (single source of truth)
+        // - attach account to its owning customer for navigation/UI purposes
+        accountRepository.save(account);
         owner.addAccount(account);
     }
+
 
 
     public List<Transaction> getTransactionsByAccount(String accountNumber) {
@@ -147,17 +159,22 @@ public class BankService {
         return nationalId == null ? null : customersByNationalId.get(nationalId.trim());
     }
     public Account findAccountByNumber(String accountNumber) {
-        if (accountNumber == null) throw new InvalidAccountException("Account number cannot be null");
-        try {
-            validateAccountNumber(accountNumber);
-        } catch (InvalidAccountException e) {
-            throw new RuntimeException(e);
+
+        if (accountNumber == null || accountNumber.trim().isEmpty()) {
+            throw new InvalidAccountException("Account number cannot be null or empty");
         }
-        if (accountsByNumber.containsKey(accountNumber)) {
-            return accountsByNumber.get(accountNumber);
+
+        validateAccountNumber(accountNumber);
+
+        Account account = accountRepository.findByNumber(accountNumber);
+
+        if (account == null) {
+            throw new ResourceNotFoundException("Account not found");
         }
-        return null;
+
+        return account;
     }
+
 //  TODO: transfer funds method --> withdraw from one account and deposit to another
     public void transferFunds(String fromAccount, String toAccount, BigDecimal amount)
      throws InvalidAccountException, InvalidNationalIdException {
@@ -193,8 +210,14 @@ public class BankService {
         }
     //    not needed but just to practice on Collections usability
         public List<Account> getAccounts() {
-            return Collections.unmodifiableList(new ArrayList<>(accountsByNumber.values()));
+
+            // Defensive Copy Pattern
+            // Returning an unmodifiable view to protect internal state
+            return Collections.unmodifiableList(
+                    accountRepository.findAll()
+            );
         }
+
     //    not needed but just to show mapping usability
         public Map<Customer, List<Account>> getCustomerAccountsMap() {
             Map<Customer, List<Account>> customerAccountsMap = new HashMap<>();

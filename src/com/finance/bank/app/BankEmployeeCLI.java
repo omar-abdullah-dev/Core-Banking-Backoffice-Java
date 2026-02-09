@@ -1,7 +1,5 @@
 package com.finance.bank.app;
 
-import com.finance.bank.exception.InsufficientAmountException;
-import com.finance.bank.exception.InvalidAmountException;
 import com.finance.bank.exception.InvalidNationalIdException;
 import com.finance.bank.model.*;
 import com.finance.bank.service.AuthenticationService;
@@ -89,7 +87,7 @@ public class BankEmployeeCLI {
             🔟 Logout & safety
     */
 
-    private static void login(Scanner in) {
+    private static void handleLogin(Scanner in) {
         while (currentEmployee == null) {
             System.out.print("Username: ");
             String username = in.nextLine();
@@ -110,41 +108,74 @@ public class BankEmployeeCLI {
         }
     }
 
+    private static void handleLogout(Scanner in) {
+        System.out.println("✓ Logged out.");
+        currentEmployee = null;
+        handleLogin(in);
+    }
+
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
-        login(in);
+        handleLogin(in);
         while (true) {
+
+            // Print menu based on current employee role
             printMenu();
+
             System.out.print("Enter your choice: ");
             String choice = in.nextLine().trim();
 
-            // Menu Options:
-            // 1 - Create Customer
-            // 2 - Add Account
-            // 3 - Show Customers
-            // 4 - Show Accounts By National ID
-            // 5 - Deposit
-            // 6 - Withdraw
-            // 7 - Transaction History
-            // 8 - Export Transaction History to Excel (CSV)
-            // 9 - Exit
+            /*
+             * Menu Options (Role-based visibility):
+             *  0 - Exit
+             * CS:
+             *  1 - Create Customer
+             *  2 - Add Account
+             *  3 - Show Customers
+             *
+             * TELLER:
+             *  5 - Deposit
+             *  6 - Withdraw
+             *  7 - Transaction History
+             *
+             * MANAGER:
+             *  All options below
+             *
+             * Common:
+             *  9 - Logout
+             */
 
             switch (choice) {
-                case "1" -> handleCreateCustomer(in);
-                case "2" -> handleAddAccount(in);
-                case "3" -> handleShowCustomers();
-                case "4" -> handleShowAccountsByNationalId(in);
-                case "5" -> handleDeposit(in);
-                case "6" -> handleWithdraw(in);
-                case "7" -> handleTransactionHistory(in);
-                case "8" -> handleExportTransactions(in);
-                case "9" -> {
+
+                // 🧑‍💼 Customer Service & Manager
+                case "1" -> handleCreateCustomer(in);           // CS, MANAGER
+                case "2" -> handleAddAccount(in);               // CS, MANAGER
+                case "3" -> handleShowCustomers();              // CS, MANAGER
+
+                // 👑 Manager only
+                case "4" -> handleShowAccountsByNationalId(in); // MANAGER
+
+                // 💵 Teller & Manager
+                case "5" -> handleDeposit(in);                  // TELLER, MANAGER
+                case "6" -> handleWithdraw(in);                 // TELLER, MANAGER
+                case "7" -> handleTransactionHistory(in);       // TELLER, MANAGER
+
+                // 📊 Manager only
+                case "8" -> handleExportTransactions(in);       // MANAGER
+
+                // 🔐 Session control
+                case "9" -> handleLogout(in);                   // Logout
+                case "0" -> {                                  // Exit application
                     handleExit();
                     return;
                 }
+
                 default -> System.out.println("[!] Invalid choice. Please try again.");
             }
+
         }
+
     }
 
     /* ========================= Helpers ========================= */
@@ -234,18 +265,55 @@ public class BankEmployeeCLI {
     /* ========================= Menu ========================= */
 
     private static void printMenu() {
+
         System.out.println("----------------------------------------");
-        System.out.println("         Finance Bank - Main Menu       ");
+        System.out.println(" Finance Bank - Main Menu ");
         System.out.println("----------------------------------------");
-        System.out.println("1. Create Customer");
-        System.out.println("2. Add Account");
-        System.out.println("3. Show Customers");
-        System.out.println("4. Show Accounts By National ID");
-        System.out.println("5. Deposit");
-        System.out.println("6. Withdraw");
-        System.out.println("7. Show Transaction History");
-        System.out.println("8. Export Transaction History to Excel (CSV)");
-        System.out.println("9. Exit");
+
+        switch (currentEmployee.getRole()) {
+
+            case CS -> {
+                // Customer Service operations
+                System.out.println("1. Create Customer");
+                System.out.println("2. Add Account");
+                System.out.println("3. Show Customers");
+
+                System.out.println("----------------------------------------");
+                System.out.println("9. Logout");
+                System.out.println("0. Exit");
+            }
+
+            case TELLER -> {
+                // Teller daily operations
+                System.out.println("5. Deposit");
+                System.out.println("6. Withdraw");
+                System.out.println("7. Show Transaction History");
+
+                System.out.println("----------------------------------------");
+                System.out.println("9. Logout");
+                System.out.println("0. Exit");
+            }
+
+            case MANAGER -> {
+                // Manager full access
+                System.out.println("1. Create Customer");
+                System.out.println("2. Add Account");
+                System.out.println("3. Show Customers");
+                System.out.println("4. Show Accounts By National ID");
+
+                System.out.println("----------------------------------------");
+
+                System.out.println("5. Deposit");
+                System.out.println("6. Withdraw");
+                System.out.println("7. Show Transaction History");
+                System.out.println("8. Export Transaction History to Excel (CSV)");
+
+                System.out.println("----------------------------------------");
+                System.out.println("9. Logout");
+                System.out.println("0. Exit");
+            }
+        }
+
         System.out.println("----------------------------------------");
     }
 
@@ -507,3 +575,4 @@ public class BankEmployeeCLI {
         System.out.println("\nThank you for using Finance Bank. Exiting...");
     }
 }
+

@@ -2,7 +2,9 @@ package com.finance.bank.repository;
 
 import com.finance.bank.model.Account;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AccountRepository {
@@ -20,4 +22,9 @@ public class AccountRepository {
     public boolean exists(String accountNumber) {
         return accounts.containsKey(accountNumber);
     }
+
+    public List<Account> findAll() {
+        return new ArrayList<>(accounts.values());
+    }
+
 }

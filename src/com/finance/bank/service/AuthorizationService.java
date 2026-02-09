@@ -73,8 +73,16 @@ public class AuthorizationService {
      */
     public void ensureCanDeposit(Employee employee) {
         ensureLoggedIn(employee);
-    }
 
+        if (employee.getRole() != Role.CS
+                && employee.getRole() != Role.TELLER
+                && employee.getRole() != Role.MANAGER) {
+
+            throw new UnauthorizedException(
+                    "Role " + employee.getRole() + " is not allowed to deposit"
+            );
+        }
+    }
     /**
      * Ensures that the employee is allowed to perform withdrawal operations.
      * Allowed roles: CS, TELLER, MANAGER
@@ -84,5 +92,14 @@ public class AuthorizationService {
      */
     public void ensureCanWithdraw(Employee employee) {
         ensureLoggedIn(employee);
+
+        if (employee.getRole() != Role.CS
+                && employee.getRole() != Role.TELLER
+                && employee.getRole() != Role.MANAGER) {
+
+            throw new UnauthorizedException(
+                    "Role " + employee.getRole() + " is not allowed to withdraw"
+            );
+        }
     }
 }

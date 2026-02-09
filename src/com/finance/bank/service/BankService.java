@@ -23,6 +23,8 @@ public class BankService {
     private final TransactionRepository transactionRepository;
 
     private final TransactionService transactionService;
+    private final AuthorizationService authorizationService;
+
 
     private BankService() {
 
@@ -40,6 +42,8 @@ public class BankService {
                         accountService,
                         transactionRepository
                 );
+        this.authorizationService = new AuthorizationService();
+
     }
     private static class BankServiceHolder {
         private static final BankService INSTANCE = new BankService();
@@ -51,8 +55,13 @@ public class BankService {
 
 
     //    create customer method
-public Customer createCustomer(String name, String nationalId)
-        throws DuplicateNationalIdException, InvalidNationalIdException {
+    public Customer createCustomer(Employee employee,
+                                   String name,
+                                   String nationalId)
+            throws DuplicateNationalIdException, InvalidNationalIdException {
+
+    authorizationService.ensureCanCreateCustomer(employee);
+
 
     if (nationalId == null) throw new InvalidNationalIdException("National ID cannot be null");
 
@@ -72,8 +81,11 @@ public Customer createCustomer(String name, String nationalId)
 
 
     //    open account method --> Polymorphism
-    public void openAccount(Account account)
+    public void openAccount(Employee employee, Account account)
             throws DuplicateAccountException, InvalidAccountException {
+
+        // Authorization: only CS or MANAGER can add accounts
+        authorizationService.ensureCanAddAccount(employee);
 
         if (account == null) {
             throw new ResourceNotFoundException("Account not found");
@@ -89,9 +101,9 @@ public Customer createCustomer(String name, String nationalId)
 
         // check duplicate
         /*
-        * “I refactored account storage from a List to a Map keyed
-        * by account number to ensure constant‑time lookups
-        * and enforce uniqueness at the data‑structure level.”
+         * “I refactored account storage from a List to a Map keyed
+         * by account number to ensure constant‑time lookups
+         * and enforce uniqueness at the data‑structure level.”
          */
         if (accountsByNumber.containsKey(accNum)) {
             throw new DuplicateAccountException(
@@ -112,9 +124,12 @@ public Customer createCustomer(String name, String nationalId)
         }
 
         // persist
+        // - save account in central accounts map
+        // - attach account to its owning customer
         accountsByNumber.put(accNum, account);
         owner.addAccount(account);
     }
+
 
     public List<Transaction> getTransactionsByAccount(String accountNumber) {
         return transactionRepository.findByAccountNumber(accountNumber);

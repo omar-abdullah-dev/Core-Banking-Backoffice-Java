@@ -4,6 +4,7 @@ import com.finance.bank.exception.InsufficientAmountException;
 import com.finance.bank.exception.InvalidAmountException;
 import com.finance.bank.exception.InvalidNationalIdException;
 import com.finance.bank.model.*;
+import com.finance.bank.service.AuthenticationService;
 import com.finance.bank.service.BankService;
 import com.finance.bank.util.IdGenerator;
 import com.finance.bank.util.NationalIdValidator;
@@ -18,7 +19,9 @@ import java.util.Scanner;
 import static com.finance.bank.util.NumberFormatter.timeFormatter;
 
 public class BankEmployeeCLI {
-
+    private static Employee currentEmployee;
+    private static final AuthenticationService authService =
+            new AuthenticationService();
     private static final BankService bankService = BankService.getInstance();
 //TODO: Add Employee Login & Roles (Teller, Manager) → control access to certain operations
 // (e.g. only manager can create customers/accounts).
@@ -85,9 +88,31 @@ public class BankEmployeeCLI {
             9️⃣ Printer + CSV
             🔟 Logout & safety
     */
+
+    private static void login(Scanner in) {
+        while (currentEmployee == null) {
+            System.out.print("Username: ");
+            String username = in.nextLine();
+
+            System.out.print("Password: ");
+            String password = in.nextLine();
+
+            try {
+                currentEmployee = authService.login(username, password);
+                System.out.println(
+                        "✓ Logged in as "
+                                + currentEmployee.getUserName()
+                                + " (" + currentEmployee.getRole() + ")"
+                );
+            } catch (Exception e) {
+                System.out.println("[!] " + e.getMessage());
+            }
+        }
+    }
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
-
+        login(in);
         while (true) {
             printMenu();
             System.out.print("Enter your choice: ");
@@ -224,9 +249,13 @@ public class BankEmployeeCLI {
         System.out.println("----------------------------------------");
     }
 
-    /* ========================= Handlers ========================= */
-
     private static void handleCreateCustomer(Scanner in) {
+
+        if (currentEmployee == null) {
+            System.out.println("[!] Please login first");
+            return;
+        }
+
         System.out.print("\nEnter Customer Name: ");
         String name = in.nextLine().trim();
 
@@ -234,12 +263,19 @@ public class BankEmployeeCLI {
         if (nationalId == null) return;
 
         try {
-            Customer c = bankService.createCustomer(name, nationalId);
+            Customer c =
+                    bankService.createCustomer(
+                            currentEmployee,
+                            name,
+                            nationalId
+                    );
+
             System.out.println("\n===== Customer Created Successfully =====");
-            System.out.printf("System ID     : %s%n", c.getSystemId());
+            System.out.printf("System ID : %s%n", c.getSystemId());
             System.out.printf("Customer Name : %s%n", c.getName());
-            System.out.printf("National ID   : %s%n", c.getNationalId());
+            System.out.printf("National ID : %s%n", c.getNationalId());
             System.out.println("=========================================");
+
         } catch (Exception e) {
             System.out.println("[Error] " + e.getMessage());
         }
@@ -250,6 +286,13 @@ public class BankEmployeeCLI {
     // This reflects real-world banking scenarios and keeps the system flexible.
 
     private static void handleAddAccount(Scanner in) {
+
+        // Guard: ensure employee is logged in
+        if (currentEmployee == null) {
+            System.out.println("[!] Please login first");
+            return;
+        }
+
         System.out.print("\nEnter Account Type (1 for Savings, 2 for Current): ");
         String accountType = in.nextLine().trim();
 
@@ -257,64 +300,112 @@ public class BankEmployeeCLI {
         if (customer == null) return;
 
         String accountNumber = IdGenerator.generateAccountNumber();
-        System.out.println("Generated Account Number : " + NumberFormatter.mask(accountNumber, 4));
+        System.out.println(
+                "Generated Account Number : "
+                        + NumberFormatter.mask(accountNumber, 4)
+        );
 
         try {
             switch (accountType) {
+
                 case "1" -> {
-                    SavingsAccount sa = new SavingsAccount(accountNumber, customer);
-                    bankService.openAccount(sa);
+                    SavingsAccount sa =
+                            new SavingsAccount(accountNumber, customer);
+
+                    // Authorization happens inside BankService
+                    bankService.openAccount(currentEmployee, sa);
+
                     System.out.println("✓ Savings Account Created");
                 }
+
                 case "2" -> {
-                    BigDecimal overdraft = readBigDecimal(in, "Enter Overdraft Limit: ");
+                    BigDecimal overdraft =
+                            readBigDecimal(in, "Enter Overdraft Limit: ");
                     if (overdraft == null) return;
-                    CurrentAccount ca = new CurrentAccount(accountNumber, customer, overdraft);
-                    bankService.openAccount(ca);
+
+                    CurrentAccount ca =
+                            new CurrentAccount(accountNumber, customer, overdraft);
+
+                    // Authorization happens inside BankService
+                    bankService.openAccount(currentEmployee, ca);
+
                     System.out.println("✓ Current Account Created");
                 }
+
                 default -> System.out.println("[!] Invalid account type.");
             }
+
         } catch (Exception e) {
             System.out.println("[!] " + e.getMessage());
         }
     }
 
     private static void handleDeposit(Scanner in) {
-        Customer customer = readAndValidateCustomer(in);
-        if (customer == null) return;
-        Account account = chooseAccountFromCustomer(in, customer);
+
+        // Guard: ensure employee is logged in
+        Account account = getValidatedAccount(in);
         if (account == null) return;
 
         BigDecimal amount = readBigDecimal(in, "Enter deposit amount: ");
         if (amount == null) return;
 
+
         try {
-            account.deposit(amount);
+            // Business + Authorization + Transaction handled in service
+            bankService.deposit(
+                    currentEmployee,            // employee context
+                    account.getAccountNumber(), // target account
+                    amount
+            );
+
             System.out.println("✓ Deposit successful");
             System.out.println("New Balance: " + account.getBalance());
-        } catch (InvalidAmountException e) {
+
+        } catch (Exception e) {
             System.out.println("[!] " + e.getMessage());
         }
     }
+//     Guard: ensure employee is logged in
+    private static Account getValidatedAccount(Scanner in) {
+
+        if (currentEmployee == null) {
+            System.out.println("[!] Please login first");
+            return null;
+        }
+
+        Customer customer = readAndValidateCustomer(in);
+        if (customer == null) return null;
+
+        return chooseAccountFromCustomer(in, customer);
+    }
 
     private static void handleWithdraw(Scanner in) {
-        Customer customer = readAndValidateCustomer(in);
-        if (customer == null)return;
-     Account account = chooseAccountFromCustomer(in, customer);
+
+        // Guard: ensure employee is logged in
+
+        Account account = getValidatedAccount(in);
         if (account == null) return;
 
         BigDecimal amount = readBigDecimal(in, "Enter withdrawal amount: ");
         if (amount == null) return;
 
+
         try {
-            account.withdraw(amount);
+            // Business + Authorization + Transaction handled in service
+            bankService.withdraw(
+                    currentEmployee,            // employee context
+                    account.getAccountNumber(), // target account
+                    amount
+            );
+
             System.out.println("✓ Withdrawal successful");
             System.out.println("New Balance: " + account.getBalance());
-        } catch (InvalidAmountException | InsufficientAmountException e) {
+
+        } catch (Exception e) {
             System.out.println("[!] " + e.getMessage());
         }
     }
+
 
     private static void handleTransactionHistory(Scanner in) {
         Customer customer = readAndValidateCustomer(in);

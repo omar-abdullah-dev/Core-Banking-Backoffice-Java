@@ -3,6 +3,10 @@ package com.finance.bank.service;
 import com.finance.bank.exception.*;
 import com.finance.bank.model.Account;
 import com.finance.bank.model.Customer;
+import com.finance.bank.model.Employee;
+import com.finance.bank.model.Transaction;
+import com.finance.bank.repository.AccountRepository;
+import com.finance.bank.repository.TransactionRepository;
 import com.finance.bank.util.IdGenerator;
 import com.finance.bank.util.NationalIdValidator;
 
@@ -14,12 +18,28 @@ import static com.finance.bank.util.AccountValidator.validateAccountNumber;
 
 public class BankService {
     private final Map<String, Customer> customersByNationalId = new HashMap<>();
-//    private final List<Account> accounts = new ArrayList<>();
     private final Map<String, Account> accountsByNumber = new HashMap<>();
 
+    private final TransactionRepository transactionRepository;
+
+    private final TransactionService transactionService;
 
     private BankService() {
 
+        // repositories
+        this.transactionRepository = new TransactionRepository();
+        AccountRepository accountRepository = new AccountRepository();
+
+        // services
+        AuthorizationService authorizationService = new AuthorizationService();
+        AccountService accountService = new AccountService(authorizationService, accountRepository);
+
+        this.transactionService =
+                new TransactionService(
+                        authorizationService,
+                        accountService,
+                        transactionRepository
+                );
     }
     private static class BankServiceHolder {
         private static final BankService INSTANCE = new BankService();
@@ -94,6 +114,18 @@ public Customer createCustomer(String name, String nationalId)
         // persist
         accountsByNumber.put(accNum, account);
         owner.addAccount(account);
+    }
+
+    public List<Transaction> getTransactionsByAccount(String accountNumber) {
+        return transactionRepository.findByAccountNumber(accountNumber);
+    }
+
+    public Transaction deposit(Employee employee, String accountNumber, BigDecimal amount) throws InvalidAmountException {
+        return transactionService.deposit(employee, accountNumber, amount);
+    }
+
+    public Transaction withdraw(Employee employee, String accountNumber, BigDecimal amount) throws InvalidAmountException, InsufficientAmountException {
+        return transactionService.withdraw(employee, accountNumber, amount);
     }
 
     public Customer findCustomerByNationalId(String nationalId) {

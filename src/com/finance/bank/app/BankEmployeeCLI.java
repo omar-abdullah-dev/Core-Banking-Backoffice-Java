@@ -348,13 +348,20 @@ public class BankEmployeeCLI {
         Account account = chooseAccountFromCustomer(in, customer);
         if (account == null) return;
 
-        if (account.getTransactions().isEmpty()) {
+        List<Transaction> transactions =
+                bankService.getTransactionsByAccount(account.getAccountNumber());
+
+        if (transactions.isEmpty()) {
             System.out.println("[!] No transactions to export.");
             return;
         }
 
-        TransactionPrinter.exportNewTransactions(account);
+        TransactionPrinter.exportNewTransactions(
+                account.getAccountNumber(),
+                transactions
+        );
     }
+
 
 
     private static Customer readAndValidateCustomer(Scanner in) {

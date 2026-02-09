@@ -1,69 +1,72 @@
 package com.finance.bank.util;
 
-import com.finance.bank.model.Account;
 import com.finance.bank.model.Transaction;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.finance.bank.util.NumberFormatter.timeFormatter;
 
 public final class TransactionPrinter {
-    //  disable instantiation of utility class or objects
-    private TransactionPrinter() {
-        // prevent instantiation
-    }
 
-    private static Instant lastExportedTime = null;
+    // prevent instantiation
+    private TransactionPrinter() {}
 
-    public static void exportNewTransactions(Account account) {
+    // Track last export time per account
+    private static final Map<String, Instant> lastExportedTimeMap = new HashMap<>();
 
-        String fileName =
-                "exports/transactions_" + account.getAccountNumber() + ".csv";
+    public static void exportNewTransactions(String accountNumber,
+                                             List<Transaction> transactions) {
 
+        String fileName = "exports/transactions_" + accountNumber + ".csv";
         File file = new File(fileName);
         boolean fileExists = file.exists();
 
-        List<Transaction> newTransactions =
-                account.getTransactions().stream()
-                        .filter(t ->
-                                lastExportedTime == null ||
-                                        t.getTimestamp().isAfter(lastExportedTime)
-                        )
-                        .toList();
+        Instant lastExportedTime = lastExportedTimeMap.get(accountNumber);
+
+        List<Transaction> newTransactions = transactions.stream()
+                .filter(t -> lastExportedTime == null
+                        || t.getTimestamp().isAfter(lastExportedTime))
+                .toList();
 
         if (newTransactions.isEmpty()) {
             System.out.println("[!] No new transactions to export.");
             return;
         }
 
-        try (
-                FileWriter fw = new FileWriter(file, true);
-                PrintWriter writer = new PrintWriter(fw)
-        ) {
+        try (FileWriter fw = new FileWriter(file, true);
+             PrintWriter writer = new PrintWriter(fw)) {
 
             if (!fileExists) {
                 writer.println(
-                        "Type,Amount,Balance After,Timestamp,Transaction ID"
+                        "TransactionId,AccountNumber,Type,Amount,Fee,Total,BalanceAfter,Timestamp"
                 );
             }
 
             for (Transaction t : newTransactions) {
                 writer.printf(
-                        "%s,%s,%s,%s,%s%n",
+                        "%s,%s,%s,%s,%s,%s,%s,%s%n",
+                        t.getTransactionId(),
+                        t.getAccountNumber(),
                         t.getType(),
                         t.getAmount(),
+                        t.getFee(),
+                        t.getTotal(),
                         t.getBalanceAfter(),
-                        timeFormatter(t.getTimestamp()),
-                        t.getTransactionId()
+                        timeFormatter(t.getTimestamp())
                 );
             }
 
-            lastExportedTime =
-                    newTransactions.getLast().getTimestamp();
+            // update last export time for this account
+            lastExportedTimeMap.put(
+                    accountNumber,
+                    newTransactions.getLast().getTimestamp()
+            );
 
             System.out.println("✓ New transactions exported successfully");
             System.out.println("File: " + file.getAbsolutePath());
@@ -73,6 +76,3 @@ public final class TransactionPrinter {
         }
     }
 }
-
-
-

@@ -44,21 +44,18 @@ public final class TransactionPrinter {
 
             if (!fileExists) {
                 writer.println(
-                        "TransactionId,AccountNumber,Type,Amount,Fee,Total,BalanceAfter,Timestamp"
+                        "Type,Amount,BalanceAfter,Timestamp,TransactionId"
                 );
             }
 
             for (Transaction t : newTransactions) {
                 writer.printf(
-                        "%s,%s,%s,%s,%s,%s,%s,%s%n",
-                        t.getTransactionId(),
-                        t.getAccountNumber(),
+                        "%s,%s,%s,%s,%s%n",
                         t.getType(),
                         t.getAmount(),
-                        t.getFee(),
-                        t.getTotal(),
                         t.getBalanceAfter(),
-                        timeFormatter(t.getTimestamp())
+                        timeFormatter(t.getTimestamp()),
+                        t.getTransactionId()
                 );
             }
 

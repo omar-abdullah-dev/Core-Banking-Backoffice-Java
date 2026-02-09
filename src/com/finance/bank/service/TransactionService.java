@@ -82,7 +82,7 @@ public class TransactionService {
 
         // 5) Audit record
         Transaction tx = new Transaction(
-                TransactionType.DEPOSIT,
+                TransactionType.WITHDRAWAL,
                 amount,
                 BigDecimal.ZERO,
                 account.getBalance(),

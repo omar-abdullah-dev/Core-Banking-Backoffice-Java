@@ -281,7 +281,7 @@ java -cp bin com.finance.bank.app.BankEmployeeCLI
 
 **Omar Abdullah Moharam**
 
-GitHub: [omarAbdullahMoharam](https://github.com/omarAbdullahMoharam)
+GitHub: [OmarAbdullahMoharam](https://github.com/omar-abdullah-dev)
 
 ---
 

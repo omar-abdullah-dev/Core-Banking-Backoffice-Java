@@ -48,6 +48,7 @@ public class TransactionService {
                 amount,
                 BigDecimal.ZERO,
                 account.getBalance(),
+                account,
                 employee
         );
 
@@ -81,12 +82,14 @@ public class TransactionService {
 
         // 5) Audit record
         Transaction tx = new Transaction(
-                TransactionType.WITHDRAWAL,
+                TransactionType.DEPOSIT,
                 amount,
-                Account.getWithdrawFeePercent(), // أو ZERO لو حسبت الفee داخل الحساب
+                BigDecimal.ZERO,
                 account.getBalance(),
+                account,
                 employee
         );
+
 
         // 6) Persist transaction
         transactionRepository.save(tx);

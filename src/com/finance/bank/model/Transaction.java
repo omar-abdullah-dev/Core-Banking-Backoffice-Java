@@ -21,6 +21,8 @@ public class Transaction {
     private final BigDecimal total;
     private final Instant timestamp;
     private final BigDecimal balanceAfter;
+    private final String accountNumber;
+
 
     // Audit
     private final String performedByEmployeeId;
@@ -31,6 +33,7 @@ public class Transaction {
                        BigDecimal amount,
                        BigDecimal fee,
                        BigDecimal balanceAfter,
+                       Account account,
                        Employee employee) {
 
         this.transactionId = IdGenerator.generateTransactionId();
@@ -41,10 +44,15 @@ public class Transaction {
         this.balanceAfter = balanceAfter;
         this.timestamp = Instant.now();
 
+        // Account context
+        this.accountNumber = account.getAccountNumber();
+
+        // Audit
         this.performedByEmployeeId = employee.getSystemId();
         this.performedByEmployeeName = employee.getName();
         this.performedByRole = employee.getRole();
     }
+
 
     public String getTransactionId() {
         return transactionId;
@@ -67,4 +75,8 @@ public class Transaction {
     public BigDecimal getBalanceAfter() {
         return balanceAfter;
     }
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
 }

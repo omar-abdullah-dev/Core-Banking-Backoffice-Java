@@ -1,17 +1,17 @@
 package com.finance.bank.view;
 
 import com.finance.bank.model.Employee;
-import com.finance.bank.service.AuthService;
+import com.finance.bank.service.AuthenticationService;
 
 import java.util.Scanner;
 
 public class LoginView {
 
-    private final AuthService authService;
+    private final AuthenticationService authenticationService;
     private final Scanner scanner;
 
-    public LoginView(AuthService authService, Scanner scanner) {
-        this.authService = authService;
+    public LoginView(AuthenticationService authenticationService, Scanner scanner) {
+        this.authenticationService = authenticationService;
         this.scanner = scanner;
     }
 
@@ -30,7 +30,7 @@ public class LoginView {
             System.out.print("Password: ");
             String password = scanner.nextLine().trim();
 
-            Employee employee = authService.login(username, password);
+            Employee employee = authenticationService.login(username, password);
 
             if (employee != null) {
                 System.out.println();
@@ -45,9 +45,9 @@ public class LoginView {
     }
     static void main(String[] args) {
 
-        AuthService authService = new AuthService();
+        AuthenticationService authenticationService = new AuthenticationService();
         Scanner scanner = new Scanner(System.in);
-        LoginView loginView = new LoginView(authService, scanner);
+        LoginView loginView = new LoginView(authenticationService, scanner);
         loginView.show();
     }
 

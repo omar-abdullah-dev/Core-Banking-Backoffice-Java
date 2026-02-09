@@ -56,7 +56,7 @@ public Customer createCustomer(String name, String nationalId)
             throws DuplicateAccountException, InvalidAccountException {
 
         if (account == null) {
-            throw new IllegalArgumentException("Account cannot be null");
+            throw new ResourceNotFoundException("Account not found");
         }
 
         String accNum = account.getAccountNumber();
@@ -115,10 +115,10 @@ public Customer createCustomer(String name, String nationalId)
     public void transferFunds(String fromAccount, String toAccount, BigDecimal amount)
      throws InvalidAccountException, InvalidNationalIdException {
         if (fromAccount == null) {
-            throw new InvalidAccountException("From account cannot be null");
+            throw new ResourceNotFoundException("From account cannot be null");
         }
         if (toAccount == null) {
-            throw new InvalidAccountException("To account cannot be null");
+            throw new ResourceNotFoundException("To account cannot be null");
         }
         Account from = findAccountByNumber(fromAccount);
         Account to = findAccountByNumber(toAccount);

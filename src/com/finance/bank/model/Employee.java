@@ -31,8 +31,8 @@ public class Employee extends Person {
         return getName();
     }
 
-    public String getRole() {
-        return role.toString();
+    public Role getRole() {
+        return role;
     }
 
 }

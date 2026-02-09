@@ -1,12 +1,13 @@
 package com.finance.bank.service;
 
+import com.finance.bank.exception.AuthenticationException;
 import com.finance.bank.model.Employee;
 import com.finance.bank.model.Role;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AuthService {
+public class AuthenticationService {
 
     // In-memory employees (temporary)
     private static final List<Employee> EMPLOYEES = new ArrayList<>();
@@ -49,6 +50,6 @@ public class AuthService {
                 return employee;
             }
         }
-        return null;
+        throw new AuthenticationException("Invalid username or password");
     }
 }

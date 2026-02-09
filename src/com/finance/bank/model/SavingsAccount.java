@@ -13,22 +13,25 @@ public class SavingsAccount extends Account {
     }
 
     @Override
-    public void withdraw(BigDecimal amount) throws InsufficientAmountException, InvalidAmountException {
+    public void withdraw(BigDecimal amount)
+            throws InvalidAmountException, InsufficientAmountException {
 
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) // negative or zero amount logically is not accepted
-        {
+        // Validation: amount must be positive
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidAmountException("Amount must be greater than 0");
         }
-        BigDecimal feeAmount =amount.multiply(Account.getWithdrawFeePercent());
+
+        // Calculate withdrawal fee
+        BigDecimal feeAmount = amount.multiply(Account.getWithdrawFeePercent());
         BigDecimal total = amount.add(feeAmount);
-        if (balance.compareTo(total) < 0) { // the total must be less than balance
+
+        // Savings accounts do NOT allow overdraft
+        if (balance.compareTo(total) < 0) {
             throw new InsufficientAmountException("Insufficient funds");
         }
-//            implement subtraction here:
-            balance = balance.subtract(total);
-            Transaction transaction = new Transaction(TransactionType.WITHDRAWAL,amount,feeAmount,balance);
-            recordTransaction(transaction);
 
+        // State mutation only
+        this.balance = this.balance.subtract(total);
     }
 
 

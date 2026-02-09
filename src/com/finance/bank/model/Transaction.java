@@ -13,6 +13,7 @@ import java.time.Instant;
  */
 
 public class Transaction {
+
     private final String transactionId;
     private final TransactionType type;
     private final BigDecimal amount;
@@ -21,22 +22,35 @@ public class Transaction {
     private final Instant timestamp;
     private final BigDecimal balanceAfter;
 
+    // Audit
+    private final String performedByEmployeeId;
+    private final String performedByEmployeeName;
+    private final Role performedByRole;
 
+    public Transaction(TransactionType type,
+                       BigDecimal amount,
+                       BigDecimal fee,
+                       BigDecimal balanceAfter,
+                       Employee employee) {
 
-    public  Transaction( TransactionType type, BigDecimal amount, BigDecimal fee, BigDecimal balanceAfter) {
         this.transactionId = IdGenerator.generateTransactionId();
         this.type = type;
         this.amount = amount;
-        this.fee= fee;
+        this.fee = fee;
         this.total = amount.add(fee);
         this.balanceAfter = balanceAfter;
         this.timestamp = Instant.now();
+
+        this.performedByEmployeeId = employee.getSystemId();
+        this.performedByEmployeeName = employee.getName();
+        this.performedByRole = employee.getRole();
     }
+
     public String getTransactionId() {
         return transactionId;
     }
-    public String getType() {
-        return type.toString();
+    public TransactionType getType() {
+        return type;
     }
     public BigDecimal getAmount() {
         return amount;

@@ -50,16 +50,27 @@ protected Account(String accountNumber, Customer owner, AccountType accountType)
         return owner;
     }
 
+    /**
+     * Increases account balance by the given amount.
+     *
+     * ⚠️ This method ONLY mutates account state (balance).
+     * ⚠️ It does NOT create or record a Transaction.
+     *
+     * Transaction creation, employee context, and audit
+     * are handled by TransactionService.
+     *
+     * @param amount amount to deposit (must be positive)
+     * @throws InvalidAmountException if amount is null or <= 0
+     */
     public void deposit(BigDecimal amount) throws InvalidAmountException {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0)
-        {
-            throw new InvalidAmountException("Invalid amount");
-        }
-        balance = balance.add(amount);
 
-        Transaction transaction = new Transaction(TransactionType.DEPOSIT, amount,new BigDecimal("0.0"), this.balance);
-//        record transaction✅
-        recordTransaction(transaction);
+        // Validate business invariant: amount must be positive
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException("Invalid deposit amount");
+        }
+
+        // State mutation only (no side effects)
+        this.balance = this.balance.add(amount);
     }
 
     public abstract void withdraw(BigDecimal amount) throws InvalidAmountException, InsufficientAmountException;

@@ -24,23 +24,32 @@ public class CurrentAccount extends Account{
     }
 
     @Override
-    public void withdraw(BigDecimal amount) throws InvalidAmountException, InsufficientAmountException {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+    public void withdraw(BigDecimal amount)
+            throws InvalidAmountException, InsufficientAmountException {
+
+        // Validation: amount must be positive
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidAmountException("Amount must be greater than 0");
         }
 
-        BigDecimal feeAmount = amount.multiply(Account.getWithdrawFeePercent()) ;
+        // Calculate withdrawal fee and resulting balance, validating against overdraft limit
+        // State mutation only (no transaction creation here)
+        this.balance = getResultingBalance(amount);;
+    }
+
+    private BigDecimal getResultingBalance(BigDecimal amount) throws InsufficientAmountException {
+        BigDecimal feeAmount = amount.multiply(Account.getWithdrawFeePercent());
         BigDecimal total = amount.add(feeAmount);
-        BigDecimal validatedBalance = balance.subtract(total);
 
+        // Validate against overdraft limit
+        // allowed minimum balance = -overdraftLimit
+        BigDecimal minAllowedBalance = overdraftLimit.negate();
+        BigDecimal resultingBalance = balance.subtract(total);
 
-        if (validatedBalance .compareTo( overdraftLimit.multiply(BigDecimal.valueOf(-1))) < 0) {
+        if (resultingBalance.compareTo(minAllowedBalance) < 0) {
             throw new InsufficientAmountException("Overdraft limit exceeded");
         }
-        balance = validatedBalance;
-        Transaction transaction = new Transaction(TransactionType.WITHDRAWAL,amount,feeAmount,balance);
-        recordTransaction(transaction);
-
+        return resultingBalance;
     }
 
 }

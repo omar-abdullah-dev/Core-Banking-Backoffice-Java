@@ -481,12 +481,20 @@ public class BankEmployeeCLI {
 
         Account account = chooseAccountFromCustomer(in, customer);
         if (account == null) return;
+        List<Transaction> transactions =
+                bankService.getTransactionsByAccount(
+                        account.getAccountNumber()
+                );
+        if (transactions.isEmpty()) {
+            System.out.println("[!] No transactions found.");
+            return;
+        }
 
         System.out.println("\n===== Transaction History =====");
         System.out.printf("Account Type: %s%n", account.getAccountType().label());
         System.out.println("--------------------------------");
 
-        account.getTransactions().stream()
+        transactions.stream()
                 .sorted(Comparator.comparing(Transaction::getTimestamp).reversed())
                 .forEach(t -> System.out.printf(
                         "%s | Amount: %s | Balance After: %s | %s | %s%n",

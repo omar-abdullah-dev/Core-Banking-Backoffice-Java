@@ -29,6 +29,7 @@ public class BankService {
     private final AccountService accountService;
     private final TransactionService transactionService;
 
+
     private static final BankService INSTANCE = new BankService();
 
 
@@ -37,12 +38,12 @@ public class BankService {
 
         // repositories
         this.accountRepository = new AccountRepository();
-        this.transactionRepository = new TransactionRepository();
 
         // services (single instances)
         this.authorizationService = new AuthorizationService();
         this.accountService =
                 new AccountService(authorizationService, accountRepository);
+        this.transactionRepository= new TransactionRepository();
 
         this.transactionService =
                 new TransactionService(
@@ -144,6 +145,10 @@ public class BankService {
 
 
     public List<Transaction> getTransactionsByAccount(String accountNumber) {
+        if (accountNumber == null || accountNumber.trim().isEmpty()) {
+            throw new IllegalArgumentException("Account number cannot be null or empty");
+        }
+
         return transactionRepository.findByAccountNumber(accountNumber);
     }
 

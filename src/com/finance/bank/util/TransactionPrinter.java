@@ -20,8 +20,14 @@ public final class TransactionPrinter {
     // Track last export time per account
     private static final Map<String, Instant> lastExportedTimeMap = new HashMap<>();
 
-    public static void exportNewTransactions(String accountNumber,
-                                             List<Transaction> transactions) {
+    public static void exportNewTransactions(String accountNumber, List<Transaction> transactions) {
+
+        // Ensure exports directory exists
+        File directory = new File("exports");
+
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new RuntimeException("Failed to create exports directory");
+        }
 
         String fileName = "exports/transactions_" + accountNumber + ".csv";
         File file = new File(fileName);
@@ -30,8 +36,7 @@ public final class TransactionPrinter {
         Instant lastExportedTime = lastExportedTimeMap.get(accountNumber);
 
         List<Transaction> newTransactions = transactions.stream()
-                .filter(t -> lastExportedTime == null
-                        || t.getTimestamp().isAfter(lastExportedTime))
+                .filter(t -> lastExportedTime == null || t.getTimestamp().isAfter(lastExportedTime))
                 .toList();
 
         if (newTransactions.isEmpty()) {
@@ -42,28 +47,28 @@ public final class TransactionPrinter {
         try (FileWriter fw = new FileWriter(file, true);
              PrintWriter writer = new PrintWriter(fw)) {
 
+            // Write header only once
             if (!fileExists) {
-                writer.println(
-                        "Type,Amount,BalanceAfter,Timestamp,TransactionId"
-                );
+                writer.println("AccountNumber,Type,Amount,BalanceAfter,PerformedBy,Role,Timestamp,TransactionId");
             }
 
             for (Transaction t : newTransactions) {
                 writer.printf(
-                        "%s,%s,%s,%s,%s%n",
+                        "%s,%s,%s,%s,%s,%s,%s,%s%n",
+                        t.getAccountNumber(),
                         t.getType(),
                         t.getAmount(),
                         t.getBalanceAfter(),
+                        t.getPerformedByEmployeeName(),
+                        t.getPerformedByRole(),
                         timeFormatter(t.getTimestamp()),
                         t.getTransactionId()
                 );
             }
 
-            // update last export time for this account
-            lastExportedTimeMap.put(
-                    accountNumber,
-                    newTransactions.getLast().getTimestamp()
-            );
+            // safer than getLast()
+            Instant latestTimestamp = newTransactions.get(newTransactions.size() - 1).getTimestamp();
+            lastExportedTimeMap.put(accountNumber, latestTimestamp);
 
             System.out.println("✓ New transactions exported successfully");
             System.out.println("File: " + file.getAbsolutePath());

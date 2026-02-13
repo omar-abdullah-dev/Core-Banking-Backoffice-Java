@@ -497,10 +497,12 @@ public class BankEmployeeCLI {
         transactions.stream()
                 .sorted(Comparator.comparing(Transaction::getTimestamp).reversed())
                 .forEach(t -> System.out.printf(
-                        "%s | Amount: %s | Balance After: %s | %s | %s%n",
+                        "%s | Amount: %s | Balance After: %s | By: %s (%s) | %s | %s%n",
                         t.getType(),
                         t.getAmount(),
                         t.getBalanceAfter(),
+                        t.getPerformedByEmployeeName(),   // employee name
+                        t.getPerformedByRole(),           // employee role
                         timeFormatter(t.getTimestamp()),
                         t.getTransactionId()
                 ));

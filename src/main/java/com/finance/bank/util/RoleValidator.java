@@ -10,7 +10,7 @@ public class RoleValidator {
         if (role == null) {
             throw new IllegalArgumentException("Employee role cannot be null");
         } else if (role != Role.TELLER && role != Role.MANAGER && role != Role.CS) {
-            throw new IllegalArgumentException(STR."Invalid employee role: \{role}");
+            throw new IllegalArgumentException("User role " + role + " not allowed");
         }
     }
 }

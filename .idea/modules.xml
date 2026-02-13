@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BankSystemWIthExceptions.iml" filepath="$PROJECT_DIR$/BankSystemWIthExceptions.iml" />
+      <module fileurl="file://$PROJECT_DIR$/banking-system.iml" filepath="$PROJECT_DIR$/banking-system.iml" />
     </modules>
   </component>
 </project>

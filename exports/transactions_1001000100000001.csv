@@ -1,2 +1,5 @@
 AccountNumber,Type,Amount,BalanceAfter,PerformedBy,Role,Timestamp,TransactionId
 1.001E+15,Deposit,1000,1596,ahmed,Manager,13 Feb 2026 - 01:49 PM,TXN-f1b12384-a7e7-414a-8ea2-aee2a6c04ef4
+1001000100000001,Deposit,4000,4000,ahmed,Manager,13 Feb 2026 - 02:10 PM,TXN-cd3f0abc-501b-42b8-a8f3-475ee8ac6a58
+1001000100000001,Withdrawal,1000,2990.00,ahmed,Manager,13 Feb 2026 - 02:10 PM,TXN-1d2b8739-6798-47d3-b00e-9ba923b01c90
+1001000100000001,Deposit,1500,4490.00,ahmed,Manager,13 Feb 2026 - 02:11 PM,TXN-bd48d2e3-07ca-4519-af24-432feca8c69e

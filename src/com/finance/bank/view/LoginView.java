@@ -5,50 +5,57 @@ import com.finance.bank.service.AuthenticationService;
 
 import java.util.Scanner;
 
+/**
+ * Handles employee login and authentication display logic
+ */
 public class LoginView {
-
-    private final AuthenticationService authenticationService;
     private final Scanner scanner;
+    private final AuthenticationService authService;
 
-    public LoginView(AuthenticationService authenticationService, Scanner scanner) {
-        this.authenticationService = authenticationService;
+    public LoginView(Scanner scanner, AuthenticationService authService) {
         this.scanner = scanner;
+        this.authService = authService;
     }
 
     /**
-     * Displays login screen and blocks until login succeeds
+     * Handles the login process until successful authentication
+     * @return Authenticated Employee
      */
-    public Employee show() {
-        System.out.println("=================================");
-        System.out.println("      Banking System Login       ");
-        System.out.println("=================================");
-
-        while (true) {
+    public Employee handleLogin() {
+        Employee employee = null;
+        
+        while (employee == null) {
+            System.out.println("\n========================================");
+            System.out.println("         Finance Bank - Login");
+            System.out.println("========================================");
+            
             System.out.print("Username: ");
             String username = scanner.nextLine().trim();
 
             System.out.print("Password: ");
             String password = scanner.nextLine().trim();
 
-            Employee employee = authenticationService.login(username, password);
-
-            if (employee != null) {
-                System.out.println();
-                System.out.println("Login successful.");
-                System.out.println(STR."Welcome, \{employee.getName()} (\{employee.getRole()})");
-                System.out.println();
-                return employee;
+            try {
+                employee = authService.login(username, password);
+                displayLoginSuccess(employee);
+            } catch (Exception e) {
+                displayLoginError(e.getMessage());
             }
-
-            System.out.println("Invalid username or password. Please try again.\n");
         }
-    }
-    static void main(String[] args) {
-
-        AuthenticationService authenticationService = new AuthenticationService();
-        Scanner scanner = new Scanner(System.in);
-        LoginView loginView = new LoginView(authenticationService, scanner);
-        loginView.show();
+        
+        return employee;
     }
 
+    private void displayLoginSuccess(Employee employee) {
+        System.out.println("\n✓ Login Successful!");
+        System.out.println("========================================");
+        System.out.printf("Logged in as: %s%n", employee.getUserName());
+        System.out.printf("Role: %s%n", employee.getRole());
+        System.out.println("========================================\n");
+    }
+
+    private void displayLoginError(String message) {
+        System.out.println("\n[!] Login Failed: " + message);
+        System.out.println("Please try again.\n");
+    }
 }

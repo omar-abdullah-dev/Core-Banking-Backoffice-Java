@@ -15,60 +15,65 @@ This project simulates how **bank employees** manage customers, accounts, and tr
 ```
 exports/
 src/
-└── com/finance/bank/
-    ├── app/
-    │   └── BankEmployeeCLI.java          (Main controller & entry point)
-    │
-    ├── view/
-    │   ├── LoginView.java                (Authentication UI)
-    │   ├── MenuView.java                 (Role-based menu display)
-    │   ├── CustomerView.java             (Customer operations UI)
-    │   ├── AccountView.java              (Account operations UI)
-    │   ├── TransactionView.java          (Transaction operations UI)
-    │   └── InputValidator.java           (Reusable input validation)
-    │
-    ├── exception/
-    │   ├── AccessDeniedException.java
-    │   ├── AuthenticationException.java
-    │   ├── DuplicateAccountException.java
-    │   ├── DuplicateNationalIdException.java
-    │   ├── InsufficientAmountException.java
-    │   ├── InvalidAccountException.java
-    │   ├── InvalidAmountException.java
-    │   ├── InvalidNationalIdException.java
-    │   ├── ResourceNotFoundException.java
-    │   └── UnauthorizedException.java
-    │
-    ├── model/
-    │   ├── Account.java
-    │   ├── AccountType.java
-    │   ├── CurrentAccount.java
-    │   ├── SavingsAccount.java
-    │   ├── Customer.java
-    │   ├── Employee.java
-    │   ├── Person.java
-    │   ├── Role.java
-    │   ├── Transaction.java
-    │   └── TransactionType.java
-    │
-    ├── repository/
-    │   ├── AccountRepository.java
-    │   ├── CustomerRepository.java
-    │   └── TransactionRepository.java
-    │
-    ├── service/
-    │   ├── AuthenticationService.java
-    │   ├── AuthorizationService.java
-    │   ├── AccountService.java
-    │   ├── TransactionService.java
-    │   └── BankService.java
-    │
-    └── util/
-        ├── AccountValidator.java
-        ├── IdGenerator.java
-        ├── NationalIdValidator.java
-        ├── NumberFormatter.java
-        └── TransactionPrinter.java
+└── main/
+    └── java
+     └── com/finance/bank/
+      ├── app/
+      │   └── BankEmployeeCLI.java          (Main controller & entry point)
+      │
+      ├── view/
+      │   ├── LoginView.java                (Authentication UI)
+      │   ├── MenuView.java                 (Role-based menu display)
+      │   ├── CustomerView.java             (Customer operations UI)
+      │   ├── AccountView.java              (Account operations UI)
+      │   ├── TransactionView.java          (Transaction operations UI)
+      │   └── InputValidator.java           (Reusable input validation)
+      │
+      ├── exception/
+      │   ├── AccessDeniedException.java
+      │   ├── AuthenticationException.java
+      │   ├── DuplicateAccountException.java
+      │   ├── DuplicateNationalIdException.java
+      │   ├── InsufficientAmountException.java
+      │   ├── InvalidAccountException.java
+      │   ├── InvalidAmountException.java
+      │   ├── InvalidNationalIdException.java
+      │   ├── ResourceNotFoundException.java
+      │   └── UnauthorizedException.java
+      │
+      ├── model/
+      │   ├── Account.java
+      │   ├── AccountType.java
+      │   ├── CurrentAccount.java
+      │   ├── SavingsAccount.java
+      │   ├── Customer.java
+      │   ├── Employee.java
+      │   ├── Person.java
+      │   ├── Role.java
+      │   ├── Transaction.java
+      │   └── TransactionType.java
+      │
+      ├── repository/
+      │   ├── AccountRepository.java
+      │   ├── CustomerRepository.java
+      │   └── TransactionRepository.java
+      │
+      ├── service/
+      │   ├── AuthenticationService.java
+      │   ├── AuthorizationService.java
+      │   ├── AccountService.java
+      │   ├── TransactionService.java
+      │   └── BankService.java
+      │
+      └── util/
+          ├── AccountValidator.java
+          ├── IdGenerator.java
+          ├── NationalIdValidator.java
+          ├── NumberFormatter.java
+          └── TransactionPrinter.java
+    └── test/
+        └── java
+            └── BankingSystemTests.java
 
 ```
 

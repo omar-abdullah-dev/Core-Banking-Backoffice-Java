@@ -27,7 +27,7 @@ public class Transaction {
     // Audit
     private final String performedByEmployeeId;
     private final String performedByEmployeeName;
-    private final Role performedByRole;
+    private final EmployeeRole performedByRole;
 
     public Transaction(TransactionType type,
                        BigDecimal amount,
@@ -85,7 +85,7 @@ public class Transaction {
     public String getPerformedByEmployeeName() {
         return performedByEmployeeName;
     }
-    public Role getPerformedByRole() {
+    public EmployeeRole getPerformedByRole() {
         return performedByRole;
     }
 

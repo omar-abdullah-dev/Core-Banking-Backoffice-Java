@@ -7,10 +7,10 @@ public class Employee extends Person {
 ////  maybe we can have a display name for UI purposes, but for now we can just use the username as the display name
 //    private final String displayName;
 
-    private final Role role;
+    private final EmployeeRole role;
     private final String password;
 
-    public Employee(String userName, String password, String nationalId, Role role) {
+    public Employee(String userName, String password, String nationalId, EmployeeRole role) {
         super(userName, nationalId);
         RoleValidator.validate(role);
         PasswordValidator.validate(password);
@@ -25,7 +25,7 @@ public class Employee extends Person {
                     String email,
                     String phone,
                     String password,
-                    Role role) {
+                    EmployeeRole role) {
 
         super(systemId, userName, nationalId, email, phone);
         RoleValidator.validate(role);
@@ -43,7 +43,7 @@ public class Employee extends Person {
         return getName();
     }
 
-    public Role getRole() {
+    public EmployeeRole getRole() {
         return role;
     }
 }

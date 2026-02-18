@@ -1,15 +1,15 @@
 package com.finance.bank.util;
 
-import com.finance.bank.model.Role;
+import com.finance.bank.model.EmployeeRole;
 
 public class RoleValidator {
 
     private RoleValidator() {}
 
-    public static void validate(Role role) {
+    public static void validate(EmployeeRole role) {
         if (role == null) {
             throw new IllegalArgumentException("Employee role cannot be null");
-        } else if (role != Role.TELLER && role != Role.MANAGER && role != Role.CS) {
+        } else if (role != EmployeeRole.TELLER && role != EmployeeRole.MANAGER && role != EmployeeRole.CS) {
             throw new IllegalArgumentException("User role " + role + " not allowed");
         }
     }

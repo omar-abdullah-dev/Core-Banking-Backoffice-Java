@@ -1,3 +1,5 @@
+package com.finance.bank.test;
+
 import com.finance.bank.exception.*;
 import com.finance.bank.model.*;
 import com.finance.bank.service.*;
@@ -11,12 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Comprehensive test suite for the Banking Employee System
  *
- * CRITICAL FIXES APPLIED:
- * 1. BankService.reset() in @BeforeEach for test isolation
- * 2. Proper BigDecimal scale handling (2 decimal places)
- * 3. TransactionType verification (DEPOSIT vs WITHDRAW)
- * 4. ResourceNotFoundException for invalid accounts
- * 5. Insertion order preservation in transaction history
+ * FIXED: All account numbers now use correct bank prefix (10010001) + 8 additional digits
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class BankingSystemTest {
@@ -30,20 +27,23 @@ class BankingSystemTest {
 
     @BeforeEach
     void setUp() {
-        // CRITICAL FIX: Reset singleton state before each test
         bankService = BankService.getInstance();
-        bankService.reset(); // ✅ Ensures test isolation
+        bankService.reset();
 
         authService = new AuthenticationService();
 
-        // Login test employees
         try {
-            manager = authService.login("ahmed", "ahmedPass!");
-            teller = authService.login("mohamed", "mohamedPass!");
-            customerService = authService.login("omar", "omarPass!");
+            manager = authService.login("manager", "manager123");
+            teller = authService.login("teller", "teller123");
+            customerService = authService.login("cs", "cs123456"); // ✅ FIXED: minimum 6 chars
         } catch (AuthenticationException e) {
             fail("Failed to login test employees: " + e.getMessage());
         }
+    }
+
+    // Helper method to generate valid account numbers with bank prefix
+    private String generateAccountNumber(int suffix) {
+        return String.format("10010001%08d", suffix);
     }
 
     // ============================================
@@ -55,10 +55,10 @@ class BankingSystemTest {
     @DisplayName("Should login successfully with valid credentials")
     void testValidLogin() {
         assertDoesNotThrow(() -> {
-            Employee emp = authService.login("ahmed", "ahmedPass!");
+            Employee emp = authService.login("manager", "manager123");
             assertNotNull(emp);
-            assertEquals("ahmed", emp.getUserName());
-            assertEquals(Role.MANAGER, emp.getRole());
+            assertEquals("manager", emp.getUserName());
+            assertEquals(EmployeeRole.MANAGER, emp.getRole());
         });
     }
 
@@ -75,18 +75,16 @@ class BankingSystemTest {
     @Order(3)
     @DisplayName("Should enforce role-based access for customer creation")
     void testRoleBasedAccessCustomerCreation() {
-        // Manager and CS can create customers
         assertDoesNotThrow(() -> {
             bankService.createCustomer(manager, "Test Manager Customer", "29001011234567");
         });
 
-        bankService.reset(); // Clear for next assertion
+        bankService.reset();
 
         assertDoesNotThrow(() -> {
             bankService.createCustomer(customerService, "Test CS Customer", "29001021234567");
         });
 
-        // Teller should be denied
         assertThrows(UnauthorizedException.class, () -> {
             bankService.createCustomer(teller, "Test Teller Customer", "29001031234567");
         });
@@ -96,23 +94,20 @@ class BankingSystemTest {
     @Order(4)
     @DisplayName("Should enforce role-based access for transactions")
     void testRoleBasedAccessTransactions() throws Exception {
-        // Setup: Create customer and account as manager
         Customer customer = bankService.createCustomer(manager, "Transaction Test", "29001041234567");
-        SavingsAccount account = new SavingsAccount("ACC001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(1), customer);
         bankService.openAccount(manager, account);
 
-        // Manager and Teller can perform transactions
         assertDoesNotThrow(() -> {
-            bankService.deposit(manager, "ACC001", new BigDecimal("1000"));
+            bankService.deposit(manager, generateAccountNumber(1), new BigDecimal("1000"));
         });
 
         assertDoesNotThrow(() -> {
-            bankService.withdraw(teller, "ACC001", new BigDecimal("100"));
+            bankService.withdraw(teller, generateAccountNumber(1), new BigDecimal("100"));
         });
 
-        // CS should be denied
         assertThrows(UnauthorizedException.class, () -> {
-            bankService.deposit(customerService, "ACC001", new BigDecimal("500"));
+            bankService.deposit(customerService, generateAccountNumber(1), new BigDecimal("500"));
         });
     }
 
@@ -142,17 +137,14 @@ class BankingSystemTest {
     @Order(6)
     @DisplayName("Should reject customer with invalid National ID")
     void testCreateCustomerInvalidNationalId() {
-        // Invalid length
         assertThrows(InvalidNationalIdException.class, () -> {
             bankService.createCustomer(manager, "Test User", "123");
         });
 
-        // Invalid format
         assertThrows(InvalidNationalIdException.class, () -> {
             bankService.createCustomer(manager, "Test User", "ABCD1234567890");
         });
 
-        // Invalid date
         assertThrows(InvalidNationalIdException.class, () -> {
             bankService.createCustomer(manager, "Test User", "99999991234567");
         });
@@ -164,10 +156,8 @@ class BankingSystemTest {
     void testDuplicateNationalId() throws Exception {
         String nationalId = "29001051234567";
 
-        // First customer should succeed
         bankService.createCustomer(manager, "First Customer", nationalId);
 
-        // Duplicate should fail
         assertThrows(DuplicateNationalIdException.class, () -> {
             bankService.createCustomer(manager, "Duplicate Customer", nationalId);
         });
@@ -204,14 +194,14 @@ class BankingSystemTest {
     @DisplayName("Should create savings account")
     void testCreateSavingsAccount() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Savings Test", "29001071234567");
-        SavingsAccount account = new SavingsAccount("SAV001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(10), customer);
 
         assertDoesNotThrow(() -> {
             bankService.openAccount(manager, account);
         });
 
         assertEquals(AccountType.SAVINGS, account.getAccountType());
-        assertEquals(new BigDecimal("0.00"), account.getBalance()); // ✅ Scale fix
+        assertEquals(new BigDecimal("0.00"), account.getBalance());
         assertEquals(1, customer.getAccounts().size());
     }
 
@@ -221,7 +211,7 @@ class BankingSystemTest {
     void testCreateCurrentAccountWithOverdraft() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Current Test", "29001081234567");
         BigDecimal overdraftLimit = new BigDecimal("5000");
-        CurrentAccount account = new CurrentAccount("CUR001", customer, overdraftLimit);
+        CurrentAccount account = new CurrentAccount(generateAccountNumber(11), customer, overdraftLimit);
 
         assertDoesNotThrow(() -> {
             bankService.openAccount(manager, account);
@@ -229,7 +219,7 @@ class BankingSystemTest {
 
         assertEquals(AccountType.CURRENT, account.getAccountType());
         assertEquals(overdraftLimit, account.getOverdraftLimit());
-        assertEquals(new BigDecimal("0.00"), account.getBalance()); // ✅ Scale fix
+        assertEquals(new BigDecimal("0.00"), account.getBalance());
     }
 
     @Test
@@ -238,9 +228,9 @@ class BankingSystemTest {
     void testMultipleAccountsPerCustomer() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Multi Account", "29001091234567");
 
-        SavingsAccount savings1 = new SavingsAccount("MULTI001", customer);
-        SavingsAccount savings2 = new SavingsAccount("MULTI002", customer);
-        CurrentAccount current1 = new CurrentAccount("MULTI003", customer, new BigDecimal("3000"));
+        SavingsAccount savings1 = new SavingsAccount(generateAccountNumber(120), customer);
+        SavingsAccount savings2 = new SavingsAccount(generateAccountNumber(121), customer);
+        CurrentAccount current1 = new CurrentAccount(generateAccountNumber(122), customer, new BigDecimal("3000"));
 
         bankService.openAccount(manager, savings1);
         bankService.openAccount(manager, savings2);
@@ -254,12 +244,11 @@ class BankingSystemTest {
     @DisplayName("Should prevent duplicate account numbers")
     void testDuplicateAccountNumber() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Duplicate Account Test", "29001101234567");
-        String accountNumber = "DUP001";
+        String accountNumber = generateAccountNumber(13);
 
         SavingsAccount account1 = new SavingsAccount(accountNumber, customer);
         bankService.openAccount(manager, account1);
 
-        // Attempt to create another account with same number
         SavingsAccount account2 = new SavingsAccount(accountNumber, customer);
         assertThrows(DuplicateAccountException.class, () -> {
             bankService.openAccount(manager, account2);
@@ -275,13 +264,13 @@ class BankingSystemTest {
     @DisplayName("Should deposit valid amount")
     void testValidDeposit() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Deposit Test", "29001111234567");
-        SavingsAccount account = new SavingsAccount("DEP001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(14), customer);
         bankService.openAccount(manager, account);
 
         BigDecimal depositAmount = new BigDecimal("1000.00");
 
         assertDoesNotThrow(() -> {
-            bankService.deposit(teller, "DEP001", depositAmount);
+            bankService.deposit(teller, generateAccountNumber(14), depositAmount);
         });
 
         assertEquals(depositAmount, account.getBalance());
@@ -292,11 +281,11 @@ class BankingSystemTest {
     @DisplayName("Should reject negative deposit amount")
     void testNegativeDeposit() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Negative Deposit", "29001121234567");
-        SavingsAccount account = new SavingsAccount("NEGDEP001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(15), customer);
         bankService.openAccount(manager, account);
 
         assertThrows(InvalidAmountException.class, () -> {
-            bankService.deposit(teller, "NEGDEP001", new BigDecimal("-100"));
+            bankService.deposit(teller, generateAccountNumber(15), new BigDecimal("-100"));
         });
     }
 
@@ -305,11 +294,11 @@ class BankingSystemTest {
     @DisplayName("Should reject zero deposit amount")
     void testZeroDeposit() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Zero Deposit", "29001131234567");
-        SavingsAccount account = new SavingsAccount("ZERODEP001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(16), customer);
         bankService.openAccount(manager, account);
 
         assertThrows(InvalidAmountException.class, () -> {
-            bankService.deposit(teller, "ZERODEP001", BigDecimal.ZERO);
+            bankService.deposit(teller, generateAccountNumber(16), BigDecimal.ZERO);
         });
     }
 
@@ -318,19 +307,17 @@ class BankingSystemTest {
     @DisplayName("Should withdraw valid amount from savings account")
     void testValidWithdrawSavings() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Withdraw Test", "29001141234567");
-        SavingsAccount account = new SavingsAccount("WD001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(17), customer);
         bankService.openAccount(manager, account);
 
-        // Deposit first
-        bankService.deposit(teller, "WD001", new BigDecimal("1000"));
+        bankService.deposit(teller, generateAccountNumber(17), new BigDecimal("1000"));
 
-        // Withdraw
         BigDecimal withdrawAmount = new BigDecimal("500");
         assertDoesNotThrow(() -> {
-            bankService.withdraw(teller, "WD001", withdrawAmount);
+            bankService.withdraw(teller, generateAccountNumber(17), withdrawAmount);
         });
 
-        assertEquals(new BigDecimal("500.00"), account.getBalance()); // ✅ Scale fix
+        assertEquals(new BigDecimal("500.00"), account.getBalance());
     }
 
     @Test
@@ -338,13 +325,13 @@ class BankingSystemTest {
     @DisplayName("Should reject withdrawal exceeding balance in savings account")
     void testOverdraftRejectionSavings() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Overdraft Test", "29001151234567");
-        SavingsAccount account = new SavingsAccount("OD001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(18), customer);
         bankService.openAccount(manager, account);
 
-        bankService.deposit(teller, "OD001", new BigDecimal("100"));
+        bankService.deposit(teller, generateAccountNumber(18), new BigDecimal("100"));
 
         assertThrows(InsufficientAmountException.class, () -> {
-            bankService.withdraw(teller, "OD001", new BigDecimal("200"));
+            bankService.withdraw(teller, generateAccountNumber(18), new BigDecimal("200"));
         });
     }
 
@@ -354,19 +341,16 @@ class BankingSystemTest {
     void testOverdraftAllowedCurrent() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Current Overdraft", "29001161234567");
         BigDecimal overdraftLimit = new BigDecimal("1000");
-        CurrentAccount account = new CurrentAccount("CUROD001", customer, overdraftLimit);
+        CurrentAccount account = new CurrentAccount(generateAccountNumber(19), customer, overdraftLimit);
         bankService.openAccount(manager, account);
 
-        // Deposit 500
-        bankService.deposit(teller, "CUROD001", new BigDecimal("500"));
+        bankService.deposit(teller, generateAccountNumber(19), new BigDecimal("500"));
 
-        // Withdraw 1200 (using 500 from balance + 700 from overdraft)
         assertDoesNotThrow(() -> {
-            bankService.withdraw(teller, "CUROD001", new BigDecimal("1200"));
+            bankService.withdraw(teller, generateAccountNumber(19), new BigDecimal("1200"));
         });
 
-        // Balance should be -700
-        assertEquals(new BigDecimal("-700.00"), account.getBalance()); // ✅ Scale fix
+        assertEquals(new BigDecimal("-700.00"), account.getBalance());
     }
 
     @Test
@@ -375,14 +359,13 @@ class BankingSystemTest {
     void testOverdraftExceeded() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Overdraft Exceeded", "29001171234567");
         BigDecimal overdraftLimit = new BigDecimal("500");
-        CurrentAccount account = new CurrentAccount("ODEX001", customer, overdraftLimit);
+        CurrentAccount account = new CurrentAccount(generateAccountNumber(20), customer, overdraftLimit);
         bankService.openAccount(manager, account);
 
-        bankService.deposit(teller, "ODEX001", new BigDecimal("100"));
+        bankService.deposit(teller, generateAccountNumber(20), new BigDecimal("100"));
 
-        // Try to withdraw 700 (100 balance + 500 overdraft = 600 max)
         assertThrows(InsufficientAmountException.class, () -> {
-            bankService.withdraw(teller, "ODEX001", new BigDecimal("700"));
+            bankService.withdraw(teller, generateAccountNumber(20), new BigDecimal("700"));
         });
     }
 
@@ -395,19 +378,17 @@ class BankingSystemTest {
     @DisplayName("Should record transaction history correctly")
     void testTransactionHistory() throws Exception {
         Customer customer = bankService.createCustomer(manager, "History Test", "29001181234567");
-        SavingsAccount account = new SavingsAccount("HIST001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(21), customer);
         bankService.openAccount(manager, account);
 
-        // Perform multiple transactions
-        bankService.deposit(teller, "HIST001", new BigDecimal("1000"));
-        bankService.withdraw(teller, "HIST001", new BigDecimal("200"));
-        bankService.deposit(manager, "HIST001", new BigDecimal("500"));
+        bankService.deposit(teller, generateAccountNumber(21), new BigDecimal("1000"));
+        bankService.withdraw(teller, generateAccountNumber(21), new BigDecimal("200"));
+        bankService.deposit(manager, generateAccountNumber(21), new BigDecimal("500"));
 
-        List<Transaction> transactions = bankService.getTransactionsByAccount("HIST001");
+        List<Transaction> transactions = bankService.getTransactionsByAccount(generateAccountNumber(21));
 
         assertEquals(3, transactions.size());
 
-        // ✅ FIX: Check transaction types in INSERTION ORDER
         assertEquals(TransactionType.DEPOSIT, transactions.get(0).getType());
         assertEquals(TransactionType.WITHDRAWAL, transactions.get(1).getType());
         assertEquals(TransactionType.DEPOSIT, transactions.get(2).getType());
@@ -418,18 +399,18 @@ class BankingSystemTest {
     @DisplayName("Should include employee information in transactions")
     void testTransactionEmployeeAudit() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Audit Test", "29001191234567");
-        SavingsAccount account = new SavingsAccount("AUDIT001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(22), customer);
         bankService.openAccount(manager, account);
 
-        bankService.deposit(teller, "AUDIT001", new BigDecimal("1000"));
+        bankService.deposit(teller, generateAccountNumber(22), new BigDecimal("1000"));
 
-        List<Transaction> transactions = bankService.getTransactionsByAccount("AUDIT001");
+        List<Transaction> transactions = bankService.getTransactionsByAccount(generateAccountNumber(22));
         Transaction transaction = transactions.get(0);
 
         assertNotNull(transaction.getPerformedByEmployeeName());
         assertNotNull(transaction.getPerformedByRole());
         assertEquals(teller.getName(), transaction.getPerformedByEmployeeName());
-        assertEquals(Role.TELLER, transaction.getPerformedByRole());
+        assertEquals(EmployeeRole.TELLER, transaction.getPerformedByRole());
     }
 
     @Test
@@ -437,16 +418,15 @@ class BankingSystemTest {
     @DisplayName("Should record balance after each transaction")
     void testBalanceTracking() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Balance Track", "29001201234567");
-        SavingsAccount account = new SavingsAccount("BAL001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(23), customer);
         bankService.openAccount(manager, account);
 
-        bankService.deposit(teller, "BAL001", new BigDecimal("1000"));
-        bankService.withdraw(teller, "BAL001", new BigDecimal("300"));
-        bankService.deposit(teller, "BAL001", new BigDecimal("200"));
+        bankService.deposit(teller, generateAccountNumber(23), new BigDecimal("1000"));
+        bankService.withdraw(teller, generateAccountNumber(23), new BigDecimal("300"));
+        bankService.deposit(teller, generateAccountNumber(23), new BigDecimal("200"));
 
-        List<Transaction> transactions = bankService.getTransactionsByAccount("BAL001");
+        List<Transaction> transactions = bankService.getTransactionsByAccount(generateAccountNumber(23));
 
-        // ✅ Scale fix for all balance assertions
         assertEquals(new BigDecimal("1000.00"), transactions.get(0).getBalanceAfter());
         assertEquals(new BigDecimal("700.00"), transactions.get(1).getBalanceAfter());
         assertEquals(new BigDecimal("900.00"), transactions.get(2).getBalanceAfter());
@@ -461,7 +441,7 @@ class BankingSystemTest {
     @DisplayName("Should maintain account balance consistency")
     void testBalanceConsistency() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Consistency Test", "29001211234567");
-        SavingsAccount account = new SavingsAccount("CONS001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(24), customer);
         bankService.openAccount(manager, account);
 
         BigDecimal initialDeposit = new BigDecimal("5000");
@@ -469,10 +449,10 @@ class BankingSystemTest {
         BigDecimal deposit2 = new BigDecimal("3000");
         BigDecimal withdrawal2 = new BigDecimal("2000");
 
-        bankService.deposit(teller, "CONS001", initialDeposit);
-        bankService.withdraw(teller, "CONS001", withdrawal1);
-        bankService.deposit(teller, "CONS001", deposit2);
-        bankService.withdraw(teller, "CONS001", withdrawal2);
+        bankService.deposit(teller, generateAccountNumber(24), initialDeposit);
+        bankService.withdraw(teller, generateAccountNumber(24), withdrawal1);
+        bankService.deposit(teller, generateAccountNumber(24), deposit2);
+        bankService.withdraw(teller, generateAccountNumber(24), withdrawal2);
 
         BigDecimal expectedBalance = initialDeposit
                 .subtract(withdrawal1)
@@ -487,18 +467,17 @@ class BankingSystemTest {
     @DisplayName("Should generate unique transaction IDs")
     void testUniqueTransactionIds() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Unique ID Test", "29001221234567");
-        SavingsAccount account = new SavingsAccount("UNIQ001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(25), customer);
         bankService.openAccount(manager, account);
 
-        bankService.deposit(teller, "UNIQ001", new BigDecimal("100"));
-        bankService.deposit(teller, "UNIQ001", new BigDecimal("200"));
-        bankService.deposit(teller, "UNIQ001", new BigDecimal("300"));
+        bankService.deposit(teller, generateAccountNumber(25), new BigDecimal("100"));
+        bankService.deposit(teller, generateAccountNumber(25), new BigDecimal("200"));
+        bankService.deposit(teller, generateAccountNumber(25), new BigDecimal("300"));
 
-        List<Transaction> transactions = bankService.getTransactionsByAccount("UNIQ001");
+        List<Transaction> transactions = bankService.getTransactionsByAccount(generateAccountNumber(25));
 
         assertEquals(3, transactions.size());
 
-        // Check all IDs are unique
         String id1 = transactions.get(0).getTransactionId();
         String id2 = transactions.get(1).getTransactionId();
         String id3 = transactions.get(2).getTransactionId();
@@ -513,23 +492,20 @@ class BankingSystemTest {
     @DisplayName("Should handle concurrent operations correctly")
     void testConcurrentOperations() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Concurrent Test", "29001231234567");
-        SavingsAccount account = new SavingsAccount("CONC001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(26), customer);
         bankService.openAccount(manager, account);
 
-        // Initial deposit
-        bankService.deposit(teller, "CONC001", new BigDecimal("10000"));
+        bankService.deposit(teller, generateAccountNumber(26), new BigDecimal("10000"));
 
-        // Simulate multiple operations
         for (int i = 0; i < 10; i++) {
-            bankService.deposit(teller, "CONC001", new BigDecimal("100"));
-            bankService.withdraw(teller, "CONC001", new BigDecimal("50"));
+            bankService.deposit(teller, generateAccountNumber(26), new BigDecimal("100"));
+            bankService.withdraw(teller, generateAccountNumber(26), new BigDecimal("50"));
         }
 
-        // Expected: 10000 + (100 - 50) * 10 = 10500
-        assertEquals(new BigDecimal("10500.00"), account.getBalance()); // ✅ Scale fix
+        assertEquals(new BigDecimal("10500.00"), account.getBalance());
 
-        List<Transaction> transactions = bankService.getTransactionsByAccount("CONC001");
-        assertEquals(21, transactions.size()); // 1 initial + 10 deposits + 10 withdrawals
+        List<Transaction> transactions = bankService.getTransactionsByAccount(generateAccountNumber(26));
+        assertEquals(21, transactions.size());
     }
 
     // ============================================
@@ -541,13 +517,13 @@ class BankingSystemTest {
     @DisplayName("Should handle large deposit amounts")
     void testLargeDeposit() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Large Amount", "29001241234567");
-        SavingsAccount account = new SavingsAccount("LARGE001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(27), customer);
         bankService.openAccount(manager, account);
 
         BigDecimal largeAmount = new BigDecimal("999999999.99");
 
         assertDoesNotThrow(() -> {
-            bankService.deposit(teller, "LARGE001", largeAmount);
+            bankService.deposit(teller, generateAccountNumber(27), largeAmount);
         });
 
         assertEquals(largeAmount, account.getBalance());
@@ -558,13 +534,13 @@ class BankingSystemTest {
     @DisplayName("Should handle small decimal amounts")
     void testSmallDecimalAmounts() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Small Decimal", "29001251234567");
-        SavingsAccount account = new SavingsAccount("SMALL001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(28), customer);
         bankService.openAccount(manager, account);
 
         BigDecimal smallAmount = new BigDecimal("0.01");
 
         assertDoesNotThrow(() -> {
-            bankService.deposit(teller, "SMALL001", smallAmount);
+            bankService.deposit(teller, generateAccountNumber(28), smallAmount);
         });
 
         assertEquals(new BigDecimal("0.01"), account.getBalance());
@@ -574,9 +550,8 @@ class BankingSystemTest {
     @Order(29)
     @DisplayName("Should reject invalid account number")
     void testInvalidAccountNumber() {
-        // ✅ FIX: Should throw ResourceNotFoundException (not just any Exception)
         assertThrows(ResourceNotFoundException.class, () -> {
-            bankService.deposit(teller, "INVALID999", new BigDecimal("100"));
+            bankService.deposit(teller, generateAccountNumber(999), new BigDecimal("100"));
         });
     }
 
@@ -585,10 +560,10 @@ class BankingSystemTest {
     @DisplayName("Should handle empty transaction history")
     void testEmptyTransactionHistory() throws Exception {
         Customer customer = bankService.createCustomer(manager, "Empty History", "29001261234567");
-        SavingsAccount account = new SavingsAccount("EMPTY001", customer);
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(30), customer);
         bankService.openAccount(manager, account);
 
-        List<Transaction> transactions = bankService.getTransactionsByAccount("EMPTY001");
+        List<Transaction> transactions = bankService.getTransactionsByAccount(generateAccountNumber(30));
 
         assertNotNull(transactions);
         assertTrue(transactions.isEmpty());

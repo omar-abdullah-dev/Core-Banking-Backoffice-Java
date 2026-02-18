@@ -1,7 +1,7 @@
 package com.finance.bank.view;
 
 import com.finance.bank.model.Employee;
-import com.finance.bank.model.Role;
+import com.finance.bank.model.EmployeeRole;
 
 import java.util.Scanner;
 
@@ -26,7 +26,7 @@ public class MenuView {
         System.out.printf("Logged in as: %s (%s)%n", employee.getUserName(), employee.getRole());
         System.out.println("----------------------------------------");
 
-        Role role = employee.getRole();
+        EmployeeRole role = employee.getRole();
 
         switch (role) {
             case CS -> displayCustomerServiceMenu();

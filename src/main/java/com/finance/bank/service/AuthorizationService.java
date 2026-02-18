@@ -2,7 +2,7 @@ package com.finance.bank.service;
 
 import com.finance.bank.exception.UnauthorizedException;
 import com.finance.bank.model.Employee;
-import com.finance.bank.model.Role;
+import com.finance.bank.model.EmployeeRole;
 
 /**
    This service will implement role-based access control (RBAC) to manage permissions effectively.
@@ -40,7 +40,7 @@ public class AuthorizationService {
         ensureLoggedIn(employee);
 //      if CS or MANAGER, allow. If TELLER, deny.
 //      --> faster checking for TELLER first since they are more likely to be denied
-        if (employee.getRole() == Role.TELLER) {
+        if (employee.getRole() == EmployeeRole.TELLER) {
             throw new UnauthorizedException(
                     "Teller is not allowed to create customers"
             );
@@ -57,7 +57,7 @@ public class AuthorizationService {
     public void ensureCanAddAccount(Employee employee) {
         ensureLoggedIn(employee);
 
-        if (employee.getRole() == Role.TELLER) {
+        if (employee.getRole() == EmployeeRole.TELLER) {
             throw new UnauthorizedException(
                     "Teller is not allowed to add accounts"
             );
@@ -74,9 +74,9 @@ public class AuthorizationService {
     public void ensureCanDeposit(Employee employee) {
         ensureLoggedIn(employee);
 
-        if (employee.getRole() != Role.CS
-                && employee.getRole() != Role.TELLER
-                && employee.getRole() != Role.MANAGER) {
+        if (employee.getRole() != EmployeeRole.CS
+                && employee.getRole() != EmployeeRole.TELLER
+                && employee.getRole() != EmployeeRole.MANAGER) {
 
             throw new UnauthorizedException(
                     "Role " + employee.getRole() + " is not allowed to deposit"
@@ -93,9 +93,9 @@ public class AuthorizationService {
     public void ensureCanWithdraw(Employee employee) {
         ensureLoggedIn(employee);
 
-        if (employee.getRole() != Role.CS
-                && employee.getRole() != Role.TELLER
-                && employee.getRole() != Role.MANAGER) {
+        if (employee.getRole() != EmployeeRole.CS
+                && employee.getRole() != EmployeeRole.TELLER
+                && employee.getRole() != EmployeeRole.MANAGER) {
 
             throw new UnauthorizedException(
                     "Role " + employee.getRole() + " is not allowed to withdraw"

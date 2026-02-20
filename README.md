@@ -387,7 +387,7 @@ java -cp bin com.finance.bank.app.BankEmployeeCLI
 ### Technical Enhancements
 - Database persistence (H2/PostgreSQL/MySQL)
 - Password hashing (BCrypt)
-- Unit & integration testing (JUnit 5)
+- Integration testing (JUnit 5)
 - Logging framework (SLF4J + Logback)
 - Configuration management (properties/YAML)
 

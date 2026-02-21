@@ -42,6 +42,7 @@ public class TransactionFormController {
     @FXML private VBox        amountBox;
     @FXML private TextField   amountField;
     @FXML private Label       feeLabel;
+    @FXML private Label       tipLabel;
     @FXML private Button      actionButton;
     @FXML private VBox        alertContainer;
 
@@ -53,6 +54,14 @@ public class TransactionFormController {
     @FXML private Label receiptBalance;
     @FXML private Label receiptEmployee;
     @FXML private Label receiptTimestamp;
+
+    // Fee info card (dynamic)
+    @FXML private Label feeInfoDeposit;
+    @FXML private Label feeInfoWithdraw;
+    @FXML private VBox  feeCalculationBox;
+    @FXML private Label feeCalcAmount;
+    @FXML private Label feeCalcFee;
+    @FXML private Label feeCalcTotal;
 
     private final BankService bankService = BankService.getInstance();
     private Customer selectedCustomer;
@@ -94,8 +103,38 @@ public class TransactionFormController {
                         + "-fx-pref-width: 150; "
                         + "-fx-padding: 0 5 0 5;"
         );
+
+        // Configure tip label based on mode
+        if (isDeposit) {
+            tipLabel.setText("💡 Tip: Deposits are free of charge. The full amount will be credited to the account.");
+        } else {
+            tipLabel.setText("💡 Tip: For withdrawals, a 1% fee is applied. E.g., withdrawing EGP 1,000 deducts EGP 1,010 total.");
+        }
+
+        // Configure fee info card based on mode
+        setupFeeInfoCard(isDeposit);
+
         // Live fee display for withdrawals
-         amountField.textProperty().addListener((obs, old, text) -> updateFeeDisplay(text));
+        amountField.textProperty().addListener((obs, old, text) -> updateFeeDisplay(text));
+    }
+
+    private void setupFeeInfoCard(boolean isDeposit) {
+        // Highlight the relevant fee info
+        if (isDeposit) {
+            feeInfoDeposit.setStyle("-fx-font-size: 12px; -fx-text-fill: #1A7A4A; -fx-font-weight: bold;");
+            feeInfoWithdraw.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7A99;");
+            // Hide fee calculation for deposits
+            feeCalculationBox.setVisible(false);
+            feeCalculationBox.setManaged(false);
+        } else {
+            feeInfoDeposit.setStyle("-fx-font-size: 12px; -fx-text-fill: #6B7A99;");
+            feeInfoWithdraw.setStyle("-fx-font-size: 12px; -fx-text-fill: #C0392B; -fx-font-weight: bold;");
+            // Show fee calculation for withdrawals
+            feeCalculationBox.setVisible(true);
+            feeCalculationBox.setManaged(true);
+            // Reset to default values
+            updateFeeInfoCard(BigDecimal.ZERO);
+        }
     }
 
     @FXML
@@ -287,12 +326,28 @@ public class TransactionFormController {
                         + String.format("%,.2f", fee.doubleValue())
                         + "  |  Total deducted: EGP "
                         + String.format("%,.2f", total.doubleValue()));
+                // Update fee info card
+                updateFeeInfoCard(amt);
             } catch (NumberFormatException e) {
                 feeLabel.setText("");
+                updateFeeInfoCard(BigDecimal.ZERO);
             }
         } else {
             feeLabel.setText("DEPOSIT".equals(mode) ? "No fee for deposits." : "");
+            if ("WITHDRAW".equals(mode)) {
+                updateFeeInfoCard(BigDecimal.ZERO);
+            }
         }
+    }
+
+    private void updateFeeInfoCard(BigDecimal amount) {
+        BigDecimal fee = amount.multiply(new BigDecimal("0.01"))
+                               .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal total = amount.add(fee);
+
+        feeCalcAmount.setText("Amount: EGP " + String.format("%,.2f", amount.doubleValue()));
+        feeCalcFee.setText("Fee (1%): EGP " + String.format("%,.2f", fee.doubleValue()));
+        feeCalcTotal.setText("Total deducted: EGP " + String.format("%,.2f", total.doubleValue()));
     }
 
     private void hideAccountSection() {

@@ -97,6 +97,11 @@
                     <Label fx:id="feeLabel"
                            text=""
                            style="-fx-font-size: 11px; -fx-text-fill: #8899BB;" />
+                    <!-- Note/Tip -->
+                    <Label fx:id="tipLabel"
+                           text="💡 Tip: For withdrawals, a 1% fee is applied. E.g., withdrawing EGP 1,000 deducts EGP 1,010 total."
+                           style="-fx-font-size: 10px; -fx-text-fill: #6B7A99; -fx-wrap-text: true;"
+                           wrapText="true" />
 
                     <HBox spacing="12">
                         <Button fx:id="actionButton"
@@ -163,12 +168,15 @@
                     <Label text="Fee Information" styleClass="card-title" />
                 </VBox>
                 <VBox styleClass="card-body" spacing="8">
-                    <Label text="Deposits: No fee" style="-fx-font-size: 12px; -fx-text-fill: #1A2B4A;" />
-                    <Label text="Withdrawals: 1% fee on amount" style="-fx-font-size: 12px; -fx-text-fill: #1A2B4A;" />
+                    <Label fx:id="feeInfoDeposit" text="Deposits: No fee" style="-fx-font-size: 12px; -fx-text-fill: #1A2B4A;" />
+                    <Label fx:id="feeInfoWithdraw" text="Withdrawals: 1% fee on amount" style="-fx-font-size: 12px; -fx-text-fill: #1A2B4A;" />
                     <Separator />
-                    <Label text="Example: Withdraw EGP 1,000" style="-fx-font-size: 11px; -fx-text-fill: #6B7A99;" />
-                    <Label text="Fee: EGP 10.00" style="-fx-font-size: 11px; -fx-text-fill: #6B7A99;" />
-                    <Label text="Total deducted: EGP 1,010.00" style="-fx-font-size: 11px; -fx-text-fill: #6B7A99;" />
+                    <!-- Dynamic calculation display -->
+                    <VBox fx:id="feeCalculationBox" spacing="4">
+                        <Label fx:id="feeCalcAmount" text="Amount: EGP 0.00" style="-fx-font-size: 11px; -fx-text-fill: #1A2B4A;" />
+                        <Label fx:id="feeCalcFee" text="Fee (1%): EGP 0.00" style="-fx-font-size: 11px; -fx-text-fill: #C0392B;" />
+                        <Label fx:id="feeCalcTotal" text="Total deducted: EGP 0.00" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #1A3461;" />
+                    </VBox>
                 </VBox>
             </VBox>
         </VBox>

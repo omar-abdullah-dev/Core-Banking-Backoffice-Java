@@ -77,16 +77,25 @@ public class TransactionFormController {
 
         pageHeaderLabel.setText(isDeposit ? "Deposit" : "Withdraw");
         formTitle.setText(isDeposit ? "Deposit Funds" : "Withdraw Funds");
-        actionButton.setText(isDeposit ? "Confirm Deposit" : "Confirm Withdrawal");
+
+        String buttonText = isDeposit ? "Confirm Deposit" : "Confirm Withdrawal";
+        actionButton.setText(buttonText);
 
         String actionColor = isDeposit ? "#1A7A4A" : "#C0392B";
-        actionButton.setStyle(
-                "-fx-background-color: " + actionColor + "; -fx-text-fill: white; "
-                + "-fx-background-radius: 8; -fx-font-weight: bold; "
-                + "-fx-font-size: 13px; -fx-cursor: hand; -fx-pref-height: 40;");
 
+        actionButton.setStyle(
+                "-fx-background-color: " + actionColor + "; "
+                        + "-fx-text-fill: white; "
+                        + "-fx-background-radius: 8; "
+                        + "-fx-font-weight: bold; "
+                        + "-fx-font-size: 13px; "
+                        + "-fx-cursor: hand; "
+                        + "-fx-pref-height: 40; "
+                        + "-fx-pref-width: 150; "
+                        + "-fx-padding: 0 5 0 5;"
+        );
         // Live fee display for withdrawals
-        amountField.textProperty().addListener((obs, old, text) -> updateFeeDisplay(text));
+         amountField.textProperty().addListener((obs, old, text) -> updateFeeDisplay(text));
     }
 
     @FXML

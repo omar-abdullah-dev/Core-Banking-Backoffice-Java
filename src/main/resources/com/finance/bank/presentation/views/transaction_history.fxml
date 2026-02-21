@@ -101,14 +101,14 @@
                 <Label text="No transactions found" style="-fx-text-fill: #6B7A99;" />
             </placeholder>
             <columns>
-                <TableColumn fx:id="colType" text="Type" minWidth="110" maxWidth="130" />
-                <TableColumn fx:id="colAmount" text="Amount (EGP)" minWidth="130" />
-                <TableColumn fx:id="colBalance" text="Balance After" minWidth="130" />
-                <TableColumn fx:id="colAccount" text="Account" minWidth="150" />
-                <TableColumn fx:id="colEmployee" text="Performed By" minWidth="140" />
-                <TableColumn fx:id="colRole" text="Role" minWidth="120" />
-                <TableColumn fx:id="colTimestamp" text="Timestamp" minWidth="180" />
-                <TableColumn fx:id="colTxId" text="Transaction ID" minWidth="260" />
+                <TableColumn fx:id="colType" text="Type" minWidth="120" maxWidth="120" />
+                <TableColumn fx:id="colAmount" text="Amount (EGP)" minWidth="120" />
+                <TableColumn fx:id="colBalance" text="Balance After" minWidth="120" />
+                <TableColumn fx:id="colAccount" text="Account" minWidth="155" />
+                <TableColumn fx:id="colEmployee" text="Performed By" minWidth="105" />
+                <TableColumn fx:id="colRole" text="Role" minWidth="105" />
+                <TableColumn fx:id="colTimestamp" text="Timestamp" minWidth="170" />
+                <TableColumn fx:id="colTxId" text="Transaction ID" minWidth="335" />
             </columns>
         </TableView>
     </VBox>

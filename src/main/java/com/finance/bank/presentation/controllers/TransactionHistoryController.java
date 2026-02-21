@@ -75,7 +75,12 @@ public class TransactionHistoryController implements Initializable, EmployeeAwar
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) { setText(null); setStyle(""); return; }
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                    return;
+                }
                 Label badge = new Label(item);
                 String bc = item.equals("Deposit") ? "#E8F5EE" : "#FDECEA";
                 String tc = item.equals("Deposit") ? "#1A7A4A" : "#C0392B";

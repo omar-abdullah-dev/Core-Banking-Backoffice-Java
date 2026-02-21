@@ -163,8 +163,8 @@
                     <Label text="Fee Information" styleClass="card-title" />
                 </VBox>
                 <VBox styleClass="card-body" spacing="8">
-                    <Label text="Deposits: No fee" style="-fx-font-size: 12px;" />
-                    <Label text="Withdrawals: 1% fee on amount" style="-fx-font-size: 12px;" />
+                    <Label text="Deposits: No fee" style="-fx-font-size: 12px; -fx-text-fill: #1A2B4A;" />
+                    <Label text="Withdrawals: 1% fee on amount" style="-fx-font-size: 12px; -fx-text-fill: #1A2B4A;" />
                     <Separator />
                     <Label text="Example: Withdraw EGP 1,000" style="-fx-font-size: 11px; -fx-text-fill: #6B7A99;" />
                     <Label text="Fee: EGP 10.00" style="-fx-font-size: 11px; -fx-text-fill: #6B7A99;" />

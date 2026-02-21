@@ -165,9 +165,20 @@ public class TransactionHistoryController implements Initializable, EmployeeAwar
             return;
         }
         try {
-            String accountNumber = filteredTransactions.get(0).getAccountNumber();
-            TransactionPrinter.exportNewTransactions(accountNumber, new ArrayList<>(filteredTransactions));
-            AlertHelper.showAlert(alertContainer, "Transactions exported to CSV successfully.",
+            List<Transaction> transactionsToExport = new ArrayList<>(filteredTransactions);
+            String successMessage;
+
+            if (currentNationalIdFilter != null) {
+                // Filtered by customer - export by National ID
+                TransactionPrinter.exportByCustomer(currentNationalIdFilter, transactionsToExport);
+                successMessage = "Transactions exported for customer " + currentNationalIdFilter;
+            } else {
+                // Show all - export as audit log with employee name and timestamp
+                TransactionPrinter.exportAllTransactions(currentEmployee.getUserName(), transactionsToExport);
+                successMessage = "All transactions exported as audit log";
+            }
+
+            AlertHelper.showAlert(alertContainer, successMessage + " to CSV successfully.",
                     AlertHelper.AlertType.SUCCESS);
         } catch (Exception e) {
             showError("Export failed: " + e.getMessage());

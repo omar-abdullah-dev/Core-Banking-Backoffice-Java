@@ -282,4 +282,8 @@ public class BankService {
         }
         return Collections.unmodifiableMap(customerAccountsMap);
     }
+    //  CRITICAL: Added method to get all transactions for testing and audit purposes
+    public List<Transaction> getAllTransactions() {
+        return transactionRepository.findAll();
+    }
 }

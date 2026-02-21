@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.finance.bank.presentation.controllers.DashboardHomeController"
+      styleClass="content-area"
+      spacing="20">
+
+    <!-- Welcome Banner -->
+    <HBox styleClass="card" alignment="CENTER_LEFT" spacing="20"
+          style="-fx-background-color: #0A1628; -fx-background-radius: 12; -fx-padding: 24 28;">
+        <VBox spacing="6">
+            <Label fx:id="welcomeLabel"
+                   text="Welcome back, Manager"
+                   style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;" />
+            <Label fx:id="welcomeSub"
+                   text="You have full access to all banking operations."
+                   style="-fx-font-size: 13px; -fx-text-fill: #A8B8D8;" />
+        </VBox>
+        <Region HBox.hgrow="ALWAYS" />
+        <VBox alignment="CENTER_RIGHT" spacing="4">
+            <Label fx:id="dateTimeLabel"
+                   style="-fx-font-size: 13px; -fx-text-fill: #C8A84B;" />
+            <Label fx:id="roleDisplayLabel"
+                   style="-fx-font-size: 12px; -fx-text-fill: #6B8AB8;" />
+        </VBox>
+    </HBox>
+
+    <!-- KPI Summary Row -->
+    <HBox spacing="16">
+        <HBox styleClass="stat-card" spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="stat-icon-box, stat-icon-blue">
+                <Label text="👥" style="-fx-font-size: 20px;" />
+            </StackPane>
+            <VBox spacing="2">
+                <Label fx:id="totalCustomersLabel" text="0" styleClass="stat-value" />
+                <Label text="Total Customers" styleClass="stat-label" />
+            </VBox>
+        </HBox>
+        <HBox styleClass="stat-card" spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="stat-icon-box, stat-icon-green">
+                <Label text="💳" style="-fx-font-size: 20px;" />
+            </StackPane>
+            <VBox spacing="2">
+                <Label fx:id="totalAccountsLabel" text="0" styleClass="stat-value" />
+                <Label text="Total Accounts" styleClass="stat-label" />
+            </VBox>
+        </HBox>
+        <HBox styleClass="stat-card" spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="stat-icon-box, stat-icon-gold">
+                <Label text="📊" style="-fx-font-size: 20px;" />
+            </StackPane>
+            <VBox spacing="2">
+                <Label fx:id="totalTransactionsLabel" text="0" styleClass="stat-value" />
+                <Label text="Transactions" styleClass="stat-label" />
+            </VBox>
+        </HBox>
+        <HBox styleClass="stat-card" spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="stat-icon-box, stat-icon-purple">
+                <Label text="Σ" style="-fx-font-size: 22px; -fx-text-fill: #6B2C91; -fx-font-weight: bold;" />
+            </StackPane>
+            <VBox spacing="2">
+                <Label fx:id="totalBalanceLabel" text="EGP 0.00" styleClass="stat-value"
+                       style="-fx-font-size: 20px;" />
+                <Label text="Total Portfolio" styleClass="stat-label" />
+            </VBox>
+        </HBox>
+    </HBox>
+
+    <!-- Quick Actions + Recent Transactions -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+
+        <!-- Quick Actions Card -->
+        <VBox styleClass="card" spacing="0" minWidth="280" maxWidth="300">
+            <VBox styleClass="card-header">
+                <Label text="Quick Actions" styleClass="card-title" />
+                <Label text="Role-based available actions"
+                       style="-fx-font-size: 11px; -fx-text-fill: #8899BB;" />
+            </VBox>
+            <VBox fx:id="quickActionsBox" styleClass="card-body" spacing="10" />
+        </VBox>
+
+        <!-- Recent Transactions -->
+        <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+            <HBox styleClass="card-header" alignment="CENTER_LEFT">
+                <Label text="Recent Transactions" styleClass="card-title" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="recentTxCount" text=""
+                       style="-fx-font-size: 11px; -fx-text-fill: #8899BB;" />
+            </HBox>
+            <TableView fx:id="recentTransactionTable" VBox.vgrow="ALWAYS"
+                       style="-fx-background-radius: 0 0 12 12;"
+                       prefHeight="300">
+                <columns>
+                    <TableColumn fx:id="recColType" text="Type" minWidth="100" />
+                    <TableColumn fx:id="recColAmount" text="Amount" minWidth="120" />
+                    <TableColumn fx:id="recColAccount" text="Account" minWidth="150" />
+                    <TableColumn fx:id="recColEmployee" text="By" minWidth="120" />
+                    <TableColumn fx:id="recColTime" text="Time" minWidth="150" />
+                </columns>
+            </TableView>
+        </VBox>
+    </HBox>
+
+    <!-- Role Permissions Card (bottom) -->
+    <HBox styleClass="card" style="-fx-padding: 16 20;" alignment="CENTER_LEFT" spacing="16">
+        <Label text="Your Permissions:" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #1A2B4A;" />
+        <HBox fx:id="permissionsBox" spacing="8" />
+    </HBox>
+
+</VBox>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.finance.bank.presentation.controllers.AccountListController"
+      styleClass="content-area"
+      spacing="20">
+
+    <!-- Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="📋 Account List"
+               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1A2B4A;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="accountCountLabel" styleClass="badge, badge-blue"
+               style="-fx-font-size: 12px; -fx-padding: 4 12;" />
+        <Button text="🔄 Refresh" styleClass="btn-secondary" onAction="#handleRefresh" />
+    </HBox>
+
+    <!-- Alert Container -->
+    <VBox fx:id="alertContainer" spacing="8" />
+
+    <!-- Search Bar -->
+    <HBox styleClass="card" style="-fx-padding: 14 20;" alignment="CENTER_LEFT" spacing="16">
+        <TextField fx:id="searchField"
+                   styleClass="form-field"
+                   promptText="🔍  Search by account number or customer name..."
+                   prefWidth="340"
+                   onKeyReleased="#handleSearch" />
+        <Label text="Type:" style="-fx-font-size: 12px; -fx-text-fill: #6B7A99;" />
+        <ComboBox fx:id="typeFilter" styleClass="form-combo"
+                  onAction="#handleTypeFilter" prefWidth="140" />
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Summary Cards -->
+    <HBox spacing="16">
+        <HBox styleClass="stat-card" spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="stat-icon-box, stat-icon-blue">
+                <Label text="💳" style="-fx-font-size: 18px;" />
+            </StackPane>
+            <VBox spacing="2">
+                <Label fx:id="totalAccountsLabel" text="0" styleClass="stat-value" style="-fx-font-size: 20px;" />
+                <Label text="Total Accounts" styleClass="stat-label" />
+            </VBox>
+        </HBox>
+        <HBox styleClass="stat-card" spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="stat-icon-box, stat-icon-green">
+                <Label text="🏦" style="-fx-font-size: 18px;" />
+            </StackPane>
+            <VBox spacing="2">
+                <Label fx:id="savingsCountLabel" text="0" styleClass="stat-value" style="-fx-font-size: 20px;" />
+                <Label text="Savings Accounts" styleClass="stat-label" />
+            </VBox>
+        </HBox>
+        <HBox styleClass="stat-card" spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="stat-icon-box, stat-icon-gold">
+                <Label text="💼" style="-fx-font-size: 18px;" />
+            </StackPane>
+            <VBox spacing="2">
+                <Label fx:id="currentCountLabel" text="0" styleClass="stat-value" style="-fx-font-size: 20px;" />
+                <Label text="Current Accounts" styleClass="stat-label" />
+            </VBox>
+        </HBox>
+        <HBox styleClass="stat-card" spacing="14" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+            <StackPane styleClass="stat-icon-box, stat-icon-purple">
+                <Label text="Σ" style="-fx-font-size: 18px; -fx-text-fill: #6B2C91; -fx-font-weight: bold;" />
+            </StackPane>
+            <VBox spacing="2">
+                <Label fx:id="totalBalanceLabel" text="EGP 0.00" styleClass="stat-value" style="-fx-font-size: 18px;" />
+                <Label text="Total Balance" styleClass="stat-label" />
+            </VBox>
+        </HBox>
+    </HBox>
+
+    <!-- Account Table -->
+    <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="0">
+        <TableView fx:id="accountTable"
+                   VBox.vgrow="ALWAYS"
+                   style="-fx-background-radius: 0 0 12 12;">
+            <columns>
+                <TableColumn fx:id="colAccountNumber" text="Account Number" minWidth="170" />
+                <TableColumn fx:id="colType" text="Type" minWidth="110" maxWidth="130" />
+                <TableColumn fx:id="colBalance" text="Balance (EGP)" minWidth="140" />
+                <TableColumn fx:id="colOwner" text="Owner" minWidth="180" />
+                <TableColumn fx:id="colNationalId" text="National ID" minWidth="150" />
+                <TableColumn fx:id="colOverdraft" text="Overdraft Limit" minWidth="140" />
+            </columns>
+        </TableView>
+    </VBox>
+
+</VBox>

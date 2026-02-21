@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.finance.bank</groupId>
-    <artifactId>banking-system</artifactId>
+    <artifactId>core-banking-backoffice-system</artifactId>
 
     <!-- upgraded version -->
     <version>2.0.0</version>

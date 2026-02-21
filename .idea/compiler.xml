@@ -6,7 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="banking-system" />
+        <module name="core-banking-backoffice-system" />
       </profile>
     </annotationProcessing>
   </component>

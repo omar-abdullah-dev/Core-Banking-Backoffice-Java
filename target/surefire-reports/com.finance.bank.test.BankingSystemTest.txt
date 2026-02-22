@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.finance.bank.test.BankingSystemTest
+-------------------------------------------------------------------------------
+Tests run: 30, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.369 s - in com.finance.bank.test.BankingSystemTest

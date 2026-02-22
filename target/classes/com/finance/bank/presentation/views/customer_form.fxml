@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.finance.bank.presentation.controllers.CustomerFormController"
+      styleClass="content-area"
+      spacing="20">
+
+    <!-- Page Header -->
+    <HBox alignment="CENTER_LEFT" spacing="12">
+        <Label text="➕ Create New Customer"
+               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1A2B4A;" />
+    </HBox>
+
+    <!-- Alert Container -->
+    <VBox fx:id="alertContainer" spacing="8" />
+
+    <!-- Form Card -->
+    <HBox spacing="20">
+        <!-- Main Form -->
+        <VBox styleClass="card" spacing="0" HBox.hgrow="ALWAYS">
+            <VBox styleClass="card-header">
+                <Label text="Customer Information" styleClass="card-title" />
+                <Label text="Enter the customer's personal details below."
+                       style="-fx-font-size: 12px; -fx-text-fill: #6B7A99;" />
+            </VBox>
+
+            <VBox styleClass="card-body" spacing="20">
+                <!-- Name Field -->
+                <VBox spacing="6">
+                    <Label text="FULL NAME" styleClass="form-label" />
+                    <TextField fx:id="nameField"
+                               styleClass="form-field"
+                               promptText="e.g. Ahmed Hassan Ibrahim" />
+                </VBox>
+
+                <!-- National ID Field -->
+                <VBox spacing="6">
+                    <Label text="NATIONAL ID" styleClass="form-label" />
+                    <TextField fx:id="nationalIdField"
+                               styleClass="form-field"
+                               promptText="14-digit Egyptian National ID"
+                               maxWidth="Infinity" />
+                    <Label text="Format: 14 digits starting with 2 (born 1900s) or 3 (born 2000s)"
+                           style="-fx-font-size: 11px; -fx-text-fill: #8899BB;" />
+                </VBox>
+
+                <!-- Action Buttons -->
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Button fx:id="createButton"
+                            text="Create Customer"
+                            styleClass="btn-primary"
+                            onAction="#handleCreateCustomer"
+                            prefWidth="160" />
+                    <Button text="Clear Form"
+                            styleClass="btn-secondary"
+                            onAction="#handleClear" />
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- Info Panel -->
+        <VBox styleClass="card" minWidth="260" maxWidth="260" spacing="0">
+            <VBox styleClass="card-header">
+                <Label text="Validation Rules" styleClass="card-title" />
+            </VBox>
+            <VBox styleClass="card-body" spacing="12">
+                <Label text="✓  Name must not be empty"
+                       style="-fx-font-size: 12px; -fx-text-fill: #1A7A4A;" />
+                <Label text="✓  National ID must be 14 digits"
+                       style="-fx-font-size: 12px; -fx-text-fill: #1A7A4A;" />
+                <Label text="✓  Must start with 2 or 3"
+                       style="-fx-font-size: 12px; -fx-text-fill: #1A7A4A;" />
+                <Label text="✓  Valid birth date required"
+                       style="-fx-font-size: 12px; -fx-text-fill: #1A7A4A;" />
+                <Label text="✓  Valid governorate code"
+                       style="-fx-font-size: 12px; -fx-text-fill: #1A7A4A;" />
+                <Label text="✓  No duplicate National IDs"
+                       style="-fx-font-size: 12px; -fx-text-fill: #1A7A4A;" />
+
+                <Separator />
+
+                <Label text="Role Restriction"
+                       style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #6B7A99;" />
+                <Label text="⚠  Teller cannot create customers"
+                       style="-fx-font-size: 12px; -fx-text-fill: #B7791F;" wrapText="true" />
+            </VBox>
+        </VBox>
+    </HBox>
+
+    <!-- Result Card (shown after success) -->
+    <VBox fx:id="resultCard" styleClass="card" visible="false" managed="false">
+        <VBox styleClass="card-header">
+            <Label text="✓  Customer Created Successfully" styleClass="card-title"
+                   style="-fx-text-fill: #1A7A4A;" />
+        </VBox>
+        <VBox styleClass="card-body" spacing="12">
+            <HBox spacing="40">
+                <VBox spacing="4">
+                    <Label text="SYSTEM ID" style="-fx-font-size: 10px; -fx-text-fill: #8899BB;" />
+                    <Label fx:id="resultSystemId" style="-fx-font-size: 13px; -fx-text-fill: #1A2B4A;" />
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="NAME" style="-fx-font-size: 10px; -fx-text-fill: #8899BB;" />
+                    <Label fx:id="resultName" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1A2B4A;" />
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="NATIONAL ID" style="-fx-font-size: 10px; -fx-text-fill: #8899BB;" />
+                    <Label fx:id="resultNationalId" style="-fx-font-size: 13px; -fx-text-fill: #1A2B4A;" />
+                </VBox>
+            </HBox>
+        </VBox>
+    </VBox>
+
+</VBox>

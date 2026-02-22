@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.finance.bank.presentation.controllers.AccountFormController"
+      styleClass="content-area"
+      spacing="20">
+
+    <!-- Page Header -->
+    <HBox alignment="CENTER_LEFT">
+        <Label text="💳 Open New Account"
+               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1A2B4A;" />
+    </HBox>
+
+    <!-- Alert Container -->
+    <VBox fx:id="alertContainer" spacing="8" />
+
+    <HBox spacing="20">
+        <!-- Form Card -->
+        <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="0">
+            <VBox styleClass="card-header">
+                <Label text="Account Details" styleClass="card-title" />
+                <Label text="Search for a customer, then configure the account."
+                       style="-fx-font-size: 12px; -fx-text-fill: #6B7A99;" />
+            </VBox>
+            <VBox styleClass="card-body" spacing="20">
+
+                <!-- Step 1: Find Customer -->
+                <VBox spacing="10" style="-fx-background-color: #F8F9FC; -fx-background-radius: 8; -fx-padding: 14; -fx-border-color: #DDE3EE; -fx-border-radius: 8; -fx-border-width: 1;">
+                    <Label text="STEP 1 — FIND CUSTOMER"
+                           style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #8899BB;" />
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="nationalIdField"
+                                   styleClass="form-field"
+                                   promptText="Enter customer National ID"
+                                   HBox.hgrow="ALWAYS" />
+                        <Button text="Search"
+                                styleClass="btn-primary"
+                                onAction="#handleSearchCustomer"
+                                prefWidth="90" />
+                    </HBox>
+                    <!-- Customer Found Panel -->
+                    <HBox fx:id="customerFoundBox" visible="false" managed="false"
+                          spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-background-color: #E8F5EE; -fx-background-radius: 6; -fx-padding: 10 14; -fx-border-color: #A3D9B8; -fx-border-radius: 6; -fx-border-width: 1;">
+                        <Label text="✓" style="-fx-font-size: 16px; -fx-text-fill: #1A7A4A;" />
+                        <VBox spacing="2">
+                            <Label fx:id="foundCustomerName"
+                                   style="-fx-font-weight: bold; -fx-text-fill: #155E39;" />
+                            <Label fx:id="foundCustomerNid"
+                                   style="-fx-font-size: 11px; -fx-text-fill: #1A7A4A;" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Step 2: Account Type -->
+                <VBox spacing="10" style="-fx-background-color: #F8F9FC; -fx-background-radius: 8; -fx-padding: 14; -fx-border-color: #DDE3EE; -fx-border-radius: 8; -fx-border-width: 1;">
+                    <Label text="STEP 2 — ACCOUNT TYPE"
+                           style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #8899BB;" />
+                    <HBox spacing="12">
+                        <ToggleButton fx:id="savingsToggle" text="🏦  Savings Account"
+                                      style="-fx-pref-width: 180; -fx-pref-height: 50; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-width: 1.5; -fx-cursor: hand; -fx-font-size: 13px;" />
+                        <ToggleButton fx:id="currentToggle" text="💼  Current Account"
+                                      style="-fx-pref-width: 180; -fx-pref-height: 50; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-width: 1.5; -fx-cursor: hand; -fx-font-size: 13px;" />
+                    </HBox>
+                    <VBox fx:id="savingsInfo" visible="false" managed="false"
+                          style="-fx-background-color: #EBF0FA; -fx-background-radius: 6; -fx-padding: 10; -fx-border-color: #C0D0EC; -fx-border-radius: 6; -fx-border-width: 1;">
+                        <Label text="ℹ  Savings Account: No overdraft allowed. Withdrawals limited to current balance. 1% withdrawal fee applies."
+                               style="-fx-font-size: 12px; -fx-text-fill: #1A3461;" wrapText="true" />
+                    </VBox>
+                    <VBox fx:id="overdraftBox" visible="false" managed="false" spacing="6">
+                        <Label text="OVERDRAFT LIMIT (EGP)" styleClass="form-label" />
+                        <TextField fx:id="overdraftField"
+                                   styleClass="form-field"
+                                   promptText="e.g. 5000.00" />
+                        <Label text="Maximum amount the account can go below zero. 1% withdrawal fee applies."
+                               style="-fx-font-size: 11px; -fx-text-fill: #8899BB;" wrapText="true" />
+                    </VBox>
+                </VBox>
+
+                <!-- Generated Account Number preview -->
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="Generated Account:" style="-fx-font-size: 12px; -fx-text-fill: #6B7A99;" />
+                    <Label fx:id="generatedAccountLabel" styleClass="account-number-tag"
+                           text="XXXXXXXXXXXX----" />
+                </HBox>
+
+                <!-- Submit -->
+                <HBox spacing="12">
+                    <Button fx:id="openAccountButton"
+                            text="Open Account"
+                            styleClass="btn-primary"
+                            onAction="#handleOpenAccount"
+                            prefWidth="150" />
+                    <Button text="Reset"
+                            styleClass="btn-secondary"
+                            onAction="#handleReset" />
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <!-- Account Type Info Card -->
+        <VBox minWidth="240" maxWidth="240" spacing="12">
+            <VBox styleClass="card" spacing="0">
+                <VBox styleClass="card-header">
+                    <Label text="Savings Account" styleClass="card-title" />
+                </VBox>
+                <VBox styleClass="card-body" spacing="8">
+                    <Label text="• No overdraft facility" style="-fx-font-size: 12px;" />
+                    <Label text="• Withdrawals ≤ current balance" style="-fx-font-size: 12px;" />
+                    <Label text="• 1% withdrawal fee" style="-fx-font-size: 12px;" />
+                    <Label text="• Ideal for personal savings" style="-fx-font-size: 12px;" />
+                </VBox>
+            </VBox>
+            <VBox styleClass="card" spacing="0">
+                <VBox styleClass="card-header">
+                    <Label text="Current Account" styleClass="card-title" />
+                </VBox>
+                <VBox styleClass="card-body" spacing="8">
+                    <Label text="• Configurable overdraft limit" style="-fx-font-size: 12px;" />
+                    <Label text="• Can go below zero" style="-fx-font-size: 12px;" />
+                    <Label text="• 1% withdrawal fee" style="-fx-font-size: 12px;" />
+                    <Label text="• Ideal for business accounts" style="-fx-font-size: 12px;" />
+                </VBox>
+            </VBox>
+        </VBox>
+    </HBox>
+
+    <!-- Success Result Card -->
+    <VBox fx:id="resultCard" styleClass="card" visible="false" managed="false">
+        <VBox styleClass="card-header">
+            <Label text="✓  Account Opened Successfully" styleClass="card-title"
+                   style="-fx-text-fill: #1A7A4A;" />
+        </VBox>
+        <VBox styleClass="card-body" spacing="12">
+            <HBox spacing="40">
+                <VBox spacing="4">
+                    <Label text="ACCOUNT NUMBER" style="-fx-font-size: 10px; -fx-text-fill: #8899BB;" />
+                    <Label fx:id="resultAccountNumber" styleClass="account-number-tag" />
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="TYPE" style="-fx-font-size: 10px; -fx-text-fill: #8899BB;" />
+                    <Label fx:id="resultAccountType" style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #1A2B4A;" />
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="OWNER" style="-fx-font-size: 10px; -fx-text-fill: #8899BB;" />
+                    <Label fx:id="resultOwner" style="-fx-font-size: 13px; -fx-text-fill: #1A2B4A;" />
+                </VBox>
+                <VBox spacing="4">
+                    <Label text="INITIAL BALANCE" style="-fx-font-size: 10px; -fx-text-fill: #8899BB;" />
+                    <Label text="EGP 0.00" style="-fx-font-size: 13px; -fx-text-fill: #1A2B4A;" />
+                </VBox>
+            </HBox>
+        </VBox>
+    </VBox>
+</VBox>

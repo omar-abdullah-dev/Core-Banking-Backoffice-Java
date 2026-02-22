@@ -514,7 +514,7 @@ mvn exec:java -Dexec.mainClass="com.finance.bank.app.BankEmployeeCLI"
 | Username | Password | Role |
 |----------|----------|------|
 | `ahmed` | `ahmedPass!` | Manager |
-| `mohamed` | `MohamedPass!` | Teller |
+| `mohamed` | `mohamedPass!` | Teller |
 | `omar` | `omarPass!` | CS |
 
 ---

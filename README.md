@@ -162,7 +162,7 @@ Content:   C  | YY  | MM  | DD  | GOV  | SEQ   | CHECK
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    PRESENTATION LAYER                        │
+│                    PRESENTATION LAYER                       │
 ├─────────────────────────────┬───────────────────────────────┤
 │      CLI (Console)          │       JavaFX (Desktop)        │
 │  ┌─────────────────────┐    │    ┌─────────────────────┐    │
@@ -174,32 +174,32 @@ Content:   C  | YY  | MM  | DD  | GOV  | SEQ   | CHECK
 │  │ TransactionView     │    │    │ TransactionFormCtrl │    │
 │  └─────────────────────┘    │    └─────────────────────┘    │
 ├─────────────────────────────┴───────────────────────────────┤
-│                      SERVICE LAYER                           │
+│                      SERVICE LAYER                          │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │ BankService (Facade + Singleton)                     │    │
-│  │ ├── AuthenticationService                            │    │
-│  │ ├── AuthorizationService                             │    │
-│  │ ├── AccountService                                   │    │
-│  │ └── TransactionService                               │    │
+│  │ BankService (Facade + Singleton)                    │    │
+│  │ ├── AuthenticationService                           │    │
+│  │ ├── AuthorizationService                            │    │
+│  │ ├── AccountService                                  │    │
+│  │ └── TransactionService                              │    │
 │  └─────────────────────────────────────────────────────┘    │
 ├─────────────────────────────────────────────────────────────┤
-│                    REPOSITORY LAYER                          │
+│                    REPOSITORY LAYER                         │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │ CustomerRepository │ AccountRepository │ TxRepository│    │
+│  │CustomerRepository │ AccountRepository │ TxRepository│    │
 │  └─────────────────────────────────────────────────────┘    │
 ├─────────────────────────────────────────────────────────────┤
-│                      DOMAIN LAYER                            │
+│                      DOMAIN LAYER                           │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │ Person ← Customer, Employee                          │    │
-│  │ Account ← SavingsAccount, CurrentAccount             │    │
-│  │ Transaction, TransactionType, AccountType            │    │
-│  │ EmployeeRole                                         │    │
+│  │ Person ← Customer, Employee                         │    │
+│  │ Account ← SavingsAccount, CurrentAccount            │    │
+│  │ Transaction, TransactionType, AccountType           │    │
+│  │ EmployeeRole                                        │    │
 │  └─────────────────────────────────────────────────────┘    │
 ├─────────────────────────────────────────────────────────────┤
-│                      UTILITY LAYER                           │
+│                      UTILITY LAYER                          │
 │  ┌─────────────────────────────────────────────────────┐    │
-│  │ NationalIdValidator │ AccountValidator │ IdGenerator │    │
-│  │ NumberFormatter │ TransactionPrinter                 │    │
+│  │ NationalIdValidator │ AccountValidator │ IdGenerator│    │
+│  │ NumberFormatter │ TransactionPrinter                │    │
 │  └─────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -479,7 +479,7 @@ void setUp() {
 
 ```bash
 # Clone repository
-git clone https://github.com/omar-abdullah-dev/BankSystemWIthExceptions.git
+git clone https://github.com/omar-abdullah-dev/Core-Banking-Backoffice-Java.git
 cd BankSystemWIthExceptions
 
 # Build project
@@ -522,7 +522,7 @@ mvn exec:java -Dexec.mainClass="com.finance.bank.app.BankEmployeeCLI"
 ## 📊 Example Workflow
 
 ```
-1. Login as Manager (ahmed/pass123)
+1. Login as Manager (ahmed/ahmedPass!)
 2. Create Customer (Enter valid Egyptian National ID)
 3. Open Savings Account for customer
 4. Deposit EGP 10,000

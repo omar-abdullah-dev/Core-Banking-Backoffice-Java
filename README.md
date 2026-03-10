@@ -214,6 +214,9 @@ banking-system/
 ├── pom.xml                          # Maven configuration
 ├── README.md                        # This file
 │
+├── docs/                            # Documentation
+│   └── PostgreSQL_JDBC_Plan.docx    # Database migration plan
+│
 ├── exports/                         # CSV export output directory
 │   ├── transactions_customer_*.csv
 │   └── transactions_all_*.csv
@@ -549,7 +552,7 @@ mvn exec:java -Dexec.mainClass="com.finance.bank.app.BankEmployeeCLI"
 
 ## 🔮 Future Improvements
 
-- [ ] **Database Integration** — MySQL/PostgreSQL persistence
+- [ ] **Database Integration** — MySQL/PostgreSQL persistence (See [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.docx))
 - [ ] **Password Hashing** — BCrypt encryption
 - [ ] **Spring Boot API** — RESTful web services
 - [ ] **Web Frontend** — React/Angular client

@@ -77,6 +77,7 @@ CREATE INDEX idx_transactions_account  ON transactions(account_number);
 Insert the following records directly in `psql`:
 
 **Employees:**
+
 | username | password | national_id | role |
 |----------|----------|-------------|------|
 | ahmed | ahmed123! | 30111111700915 | MANAGER |
@@ -84,12 +85,14 @@ Insert the following records directly in `psql`:
 | mohamed | mod12345! | 30111111700916 | TELLER |
 
 **Customers:**
+
 | name | national_id |
 |------|-------------|
 | Karim Hassan | 29901011234567 |
 | Sara Ahmed | 30005021234568 |
 
 **Accounts:**
+
 | account_number | customer | type | balance |
 |----------------|----------|------|---------|
 | 1001000100000001 | Karim Hassan | SAVINGS | 5000.00 |

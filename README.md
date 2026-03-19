@@ -1,4 +1,4 @@
-# 🏦 Finance Bank — Employee Back-Office System
+# 🏦 Core Banking Back-Office System (Java, JavaFX)
 
 <div align="center">
 
@@ -8,7 +8,7 @@
 ![Maven](https://img.shields.io/badge/Maven-3.x-red?style=for-the-badge&logo=apachemaven)
 ![Version](https://img.shields.io/badge/Version-2.0.0-purple?style=for-the-badge)
 
-**A production-quality Banking Employee System built with Java, featuring both CLI and JavaFX GUI interfaces.**
+**A production-grade core banking back-office application built with Java, featuring both CLI and JavaFX desktop interfaces.**
 
 [Features](#-features) •
 [Architecture](#-architecture) •
@@ -36,6 +36,10 @@ This project simulates how bank employees manage customers, accounts, and transa
 
 > ⚠️ **Scope Notice:** This system represents **employee-assisted banking operations only**.
 > No customer self-service, online banking, or external transfers.
+
+### ATS-Friendly Project Description
+
+**Core Banking Back-Office System (Java, JavaFX)** is a layered enterprise banking application for employee operations, built with **Java 17**, **JavaFX**, **Maven**, and **JUnit 5**. It implements customer onboarding, account lifecycle management, deposits/withdrawals with business-rule validation, role-based access control (RBAC), audit-ready transaction history, and CSV export workflows. The project demonstrates clean OOP design, custom exception handling, test-driven validation of business logic, and maintainable architecture patterns (Facade, Repository, Singleton, MVC) commonly used in production banking software.
 
 ---
 
@@ -203,6 +207,12 @@ Content:   C  | YY  | MM  | DD  | GOV  | SEQ   | CHECK
 │  └─────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+---
+
+## 📚 Documentation
+
+- [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.docx)
 
 ---
 
@@ -552,7 +562,7 @@ mvn exec:java -Dexec.mainClass="com.finance.bank.app.BankEmployeeCLI"
 
 ## 🔮 Future Improvements
 
-- [ ] **Database Integration** — MySQL/PostgreSQL persistence (See [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.docx))
+- [ ] **Database Persistence Completion** — finalize repository migration to PostgreSQL (See [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.docx))
 - [ ] **Password Hashing** — BCrypt encryption
 - [ ] **Spring Boot API** — RESTful web services
 - [ ] **Web Frontend** — React/Angular client

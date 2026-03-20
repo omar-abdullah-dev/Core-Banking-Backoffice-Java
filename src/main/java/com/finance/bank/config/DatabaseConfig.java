@@ -15,7 +15,7 @@ public class DatabaseConfig    {
     static {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl("jdbc:postgresql://localhost:5432/finance_bank");
-        config.setUsername("bank_user");
+        config.setUsername("postgres");
         config.setPassword("Moharam@2002");
         config.setMaximumPoolSize(10);
         config.setMinimumIdle(2);

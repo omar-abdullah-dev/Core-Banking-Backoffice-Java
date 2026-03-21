@@ -267,6 +267,8 @@ banking-system/
 │
 ├── docs/                            # Documentation
 │   └── PostgreSQL_JDBC_Plan.md      # Database migration plan
+|  └── REFACTORING.md                # Code refactoring notes
+|  └── Action plan.md                # Development roadmap
 │
 ├── exports/                         # CSV export output directory
 │   ├── transactions_customer_*.csv

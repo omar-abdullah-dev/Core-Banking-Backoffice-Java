@@ -38,7 +38,7 @@ public class BankService {
         this.customerRepository = new CustomerRepository();
 
         // Initialize other repositories
-        this.accountRepository = new AccountRepository();
+        this.accountRepository = new AccountRepository(customerRepository);
         this.transactionRepository = new TransactionRepository();
 
         // Initialize services

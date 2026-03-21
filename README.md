@@ -215,7 +215,7 @@ Content:   C  | YY  | MM  | DD  | GOV  | SEQ   | CHECK
 
 ### Architecture & Design
 
-- **PostgreSQL JDBC Migration Plan** — [PostgreSQL_JDBC_Plan.docx](docs/PostgreSQL_JDBC_Plan.docx) outlines the transition from in-memory data structures to persistent database storage using JDBC
+- **PostgreSQL JDBC Migration Plan** — [PostgreSQL_JDBC_Plan.md](docs/PostgreSQL_JDBC_Plan.md) outlines the transition from in-memory data structures to persistent database storage using JDBC
 
 ### Database Persistence Layer
 
@@ -251,7 +251,7 @@ Refer to the PostgreSQL JDBC Plan documentation for DDL scripts and schema initi
 
 ## 📌 Documentation Index
 
-- [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.docx) — Database migration and schema design
+- [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md) — Database migration and schema design
 - [REFACTORING.md](docs/REFACTORING.md) — Code refactoring notes
 - [Action Plan](docs/Action%20plan.md) — Development roadmap
 
@@ -266,7 +266,7 @@ banking-system/
 ├── README.md                        # This file
 │
 ├── docs/                            # Documentation
-│   └── PostgreSQL_JDBC_Plan.docx    # Database migration plan
+│   └── PostgreSQL_JDBC_Plan.md      # Database migration plan
 │
 ├── exports/                         # CSV export output directory
 │   ├── transactions_customer_*.csv
@@ -603,14 +603,14 @@ mvn exec:java -Dexec.mainClass="com.finance.bank.app.BankEmployeeCLI"
 
 ## 🔮 Future Improvements
 
-- [ ] **Database Persistence Completion** — finalize repository migration to PostgreSQL (See [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.docx))
-- [ ] **Password Hashing** — BCrypt encryption
-- [ ] **Spring Boot API** — RESTful web services
-- [ ] **Web Frontend** — React/Angular client
-- [ ] **Microservices** — Service decomposition
-- [ ] **Logging Framework** — SLF4J integration
-- [ ] **Docker Support** — Containerization
-- [ ] **CI/CD Pipeline** — GitHub Actions
+- [x] **Database Persistence** — ✅ Migrated to PostgreSQL with JDBC (v2.0.0) — See [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md)
+- [ ] **Password Hashing** — BCrypt encryption for employee credentials
+- [ ] **Spring Boot API** — RESTful web services for mobile/external clients
+- [ ] **Web Frontend** — React/Angular customer portal
+- [ ] **Microservices** — Service decomposition for scalability
+- [ ] **Logging Framework** — SLF4J + Logback integration
+- [ ] **Docker Support** — Containerization for deployment
+- [ ] **CI/CD Pipeline** — GitHub Actions automated builds and tests
 
 ---
 

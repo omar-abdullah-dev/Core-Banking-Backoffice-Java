@@ -52,7 +52,8 @@ This project simulates how bank employees manage customers, accounts, and transa
 | **Build Tool** | Maven | 3.x |
 | **Testing** | JUnit Jupiter | 5.10.1 |
 | **Architecture** | Layered / MVC | - |
-| **Data Storage** | In-Memory (Repository Pattern) | - |
+| **Data Storage** | PostgreSQL with JDBC | 15+ |
+| **Connection Pool** | HikariCP | 5.1.0 |
 
 ---
 
@@ -212,7 +213,47 @@ Content:   C  | YY  | MM  | DD  | GOV  | SEQ   | CHECK
 
 ## 📚 Documentation
 
-- [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.docx)
+### Architecture & Design
+
+- **PostgreSQL JDBC Migration Plan** — [PostgreSQL_JDBC_Plan.docx](docs/PostgreSQL_JDBC_Plan.docx) outlines the transition from in-memory data structures to persistent database storage using JDBC
+
+### Database Persistence Layer
+
+**Recent Transformation (v2.0.0):**
+
+The repository layer has been migrated from in-memory collections to **PostgreSQL database persistence** with JDBC connectivity:
+
+| Component | Previous | Current |
+|-----------|----------|---------|
+| **CustomerRepository** | `HashMap<String, Customer>` | PostgreSQL via JDBC + HikariCP pooling |
+| **AccountRepository** | `HashMap<String, Account>` | PostgreSQL via JDBC + HikariCP pooling |
+| **TransactionRepository** | `ArrayList<Transaction>` | PostgreSQL via JDBC + HikariCP pooling |
+
+**Benefits of Migration:**
+- ✅ **Data Durability** — Customer, account, and transaction records persist across application restarts
+- ✅ **Concurrent Access** — Multi-session support with proper connection pooling via HikariCP
+- ✅ **Database-Level Constraints** — Unique key enforcement (National ID, account numbers) at the database layer
+- ✅ **Query Flexibility** — JDBC enables advanced filtering, pagination, and reporting capabilities
+- ✅ **Audit Trail** — Transaction history remains intact indefinitely
+- ✅ **Backward Compatibility** — Public repository interfaces remain unchanged; service layer workflows are unaffected
+
+**Database Configuration:**
+Located in `com.finance.bank.config.DatabaseConfig`:
+- **JDBC URL:** `jdbc:postgresql://localhost:5432/finance_bank`
+- **Connection Pool:** HikariCP with max 10 connections, min 2 idle connections
+- **Driver:** PostgreSQL JDBC driver
+- See [DatabaseConfig.java](src/main/java/com/finance/bank/config/DatabaseConfig.java) for details
+
+**Schema Setup:**
+Refer to the PostgreSQL JDBC Plan documentation for DDL scripts and schema initialization.
+
+---
+
+## 📌 Documentation Index
+
+- [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.docx) — Database migration and schema design
+- [REFACTORING.md](docs/REFACTORING.md) — Code refactoring notes
+- [Action Plan](docs/Action%20plan.md) — Development roadmap
 
 ---
 

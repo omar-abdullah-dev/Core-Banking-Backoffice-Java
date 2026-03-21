@@ -2,6 +2,7 @@ package com.finance.bank.service;
 
 import com.finance.bank.exception.*;
 import com.finance.bank.model.*;
+import com.finance.bank.repository.AccountRepository;
 import com.finance.bank.repository.TransactionRepository;
 
 import java.math.BigDecimal;
@@ -11,15 +12,17 @@ public class TransactionService {
     private final AuthorizationService authorizationService;
     private final AccountService accountService;
     private final TransactionRepository transactionRepository;
+    private final AccountRepository accountRepository;
 
     public TransactionService(AuthorizationService authorizationService,
                               AccountService accountService,
-                              TransactionRepository transactionRepository) {
+                              TransactionRepository transactionRepository,
+                              AccountRepository accountRepository) {
         this.authorizationService = authorizationService;
         this.accountService = accountService;
         this.transactionRepository = transactionRepository;
+        this.accountRepository = accountRepository;
     }
-
     public Transaction deposit(Employee employee,
                                String accountNumber,
                                BigDecimal amount) throws InvalidAmountException {
@@ -54,6 +57,7 @@ public class TransactionService {
 
         // 6) Persist
         transactionRepository.save(tx);
+        accountRepository.updateBalance(account.getAccountNumber(), account.getBalance());
         return tx;
     }
 
@@ -93,7 +97,7 @@ public class TransactionService {
 
         // 6) Persist transaction
         transactionRepository.save(tx);
-
+        accountRepository.updateBalance(account.getAccountNumber(), account.getBalance());
         return tx;
     }
 

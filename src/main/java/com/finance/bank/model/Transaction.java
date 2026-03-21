@@ -53,6 +53,31 @@ public class Transaction {
         this.performedByRole = employee.getRole();
     }
 
+    // Constructor for reconstructing from Database
+    public Transaction(String transactionId,
+                       TransactionType type,
+                       BigDecimal amount,
+                       BigDecimal fee,
+                       BigDecimal balanceAfter,
+                       String accountNumber,
+                       java.time.Instant timestamp,
+                       String performedByEmployeeId,
+                       String performedByEmployeeName,
+                       EmployeeRole performedByRole) {
+
+        this.transactionId           = transactionId;
+        this.type                    = type;
+        this.amount                  = amount;
+        this.fee                     = fee;
+        this.total                   = amount.add(fee);
+        this.balanceAfter            = balanceAfter;
+        this.accountNumber           = accountNumber;
+        this.timestamp               = timestamp;
+        this.performedByEmployeeId   = performedByEmployeeId;
+        this.performedByEmployeeName = performedByEmployeeName;
+        this.performedByRole         = performedByRole;
+    }
+
 
     public String getTransactionId() {
         return transactionId;

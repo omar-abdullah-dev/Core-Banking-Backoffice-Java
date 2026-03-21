@@ -47,7 +47,8 @@ public class BankService {
         this.transactionService = new TransactionService(
                 authorizationService,
                 accountService,
-                transactionRepository
+                transactionRepository,
+                accountRepository
         );
     }
 

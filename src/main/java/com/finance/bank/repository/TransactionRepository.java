@@ -1,92 +1,149 @@
 package com.finance.bank.repository;
 
-import com.finance.bank.model.Transaction;
+import com.finance.bank.config.DatabaseConfig;
+import com.finance.bank.model.*;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TransactionRepository {
-    // Main storage - all transactions in insertion order
-    private final List<Transaction> transactions = new ArrayList<>();
 
-    // Index by account number for faster lookups (preserves insertion order)
-    private final Map<String, List<Transaction>> transactionsByAccount = new LinkedHashMap<>();
+    public void save(Transaction tx) {
+        String sql = """
+                INSERT INTO transactions (
+                    transaction_id, account_number, transaction_type,
+                    amount, fee, total, balance_after, timestamp,
+                    performed_by_employee_id, performed_by_name, performed_by_role
+                ) VALUES (?, ?, ?::transaction_type_enum, ?, ?, ?, ?, ?, ?, ?, ?::employee_role_enum)
+                """;
 
-    /**
-     * Saves a transaction record
-     * @param transaction Transaction to save
-     */
-    public void save(Transaction transaction) {
-        transactions.add(transaction);
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        // Also index by account number for efficient lookup
-        transactionsByAccount
-                .computeIfAbsent(transaction.getAccountNumber(), k -> new ArrayList<>())
-                .add(transaction);
+            ps.setString(1, tx.getTransactionId());
+            ps.setString(2, tx.getAccountNumber());
+            ps.setString(3, tx.getType().name());
+            ps.setBigDecimal(4, tx.getAmount());
+            ps.setBigDecimal(5, tx.getFee());
+            ps.setBigDecimal(6, tx.getTotal());
+            ps.setBigDecimal(7, tx.getBalanceAfter());
+            ps.setTimestamp(8, Timestamp.from(tx.getTimestamp()));
+            ps.setString(9, tx.getPerformedByEmployeeId());
+            ps.setString(10, tx.getPerformedByEmployeeName());
+            ps.setString(11, tx.getPerformedByRole().name());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to save transaction: " + e.getMessage(), e);
+        }
     }
 
-    /**
-     * Returns all transactions (read-only)
-     * @return Unmodifiable list of all transactions
-     */
-    public List<Transaction> findAll() {
-        return Collections.unmodifiableList(transactions);
-    }
-
-    /**
-     * Finds transactions by account number in INSERTION ORDER
-     * This is critical for test compatibility - tests expect transactions
-     * in the order they were created
-     *
-     * @param accountNumber Account number to search for
-     * @return List of transactions for the account (defensive copy)
-     */
     public List<Transaction> findByAccountNumber(String accountNumber) {
-        List<Transaction> accountTransactions = transactionsByAccount.get(accountNumber);
+        String sql = """
+                SELECT transaction_id, account_number, transaction_type,
+                       amount, fee, total, balance_after, timestamp,
+                       performed_by_employee_id, performed_by_name, performed_by_role
+                FROM transactions
+                WHERE account_number = ?
+                ORDER BY timestamp ASC
+                """;
 
-        if (accountTransactions == null) {
-            return Collections.emptyList();
+        List<Transaction> result = new ArrayList<>();
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, accountNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) result.add(mapRow(rs));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load transactions: " + e.getMessage(), e);
         }
 
-        // Return defensive copy to prevent external modification
-        return new ArrayList<>(accountTransactions);
+        return result;
     }
 
-    /**
-     * Finds transactions performed by a specific employee
-     * @param employeeId Employee ID
-     * @return List of transactions performed by the employee
-     */
-    public List<Transaction> findByEmployeeId(String employeeId) {
-        return transactions.stream()
-                .filter(tx -> tx.getPerformedByEmployeeId().equals(employeeId))
-                .collect(Collectors.toList());
+    public List<Transaction> findAll() {
+        String sql = """
+                SELECT transaction_id, account_number, transaction_type,
+                       amount, fee, total, balance_after, timestamp,
+                       performed_by_employee_id, performed_by_name, performed_by_role
+                FROM transactions ORDER BY timestamp ASC
+                """;
+
+        List<Transaction> result = new ArrayList<>();
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) result.add(mapRow(rs));
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load transactions: " + e.getMessage(), e);
+        }
+
+        return result;
     }
 
-    /**
-     * Counts total number of transactions
-     * @return Total transaction count
-     */
     public int count() {
-        return transactions.size();
+        String sql = "SELECT COUNT(*) FROM transactions";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) return rs.getInt(1);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to count transactions: " + e.getMessage(), e);
+        }
+
+        return 0;
     }
 
-    /**
-     * Counts transactions for a specific account
-     * @param accountNumber Account number
-     * @return Transaction count for the account
-     */
     public int countByAccount(String accountNumber) {
-        List<Transaction> accountTransactions = transactionsByAccount.get(accountNumber);
-        return accountTransactions != null ? accountTransactions.size() : 0;
+        String sql = "SELECT COUNT(*) FROM transactions WHERE account_number = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, accountNumber);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to count transactions: " + e.getMessage(), e);
+        }
+
+        return 0;
     }
 
-    /**
-     * CRITICAL FOR TESTING: Clears all transactions
-     * Use in BankService.reset() for test isolation
-     */
     public void clear() {
-        transactions.clear();
-        transactionsByAccount.clear();
+        try (Connection conn = DatabaseConfig.getConnection();
+             Statement st = conn.createStatement()) {
+            st.executeUpdate("DELETE FROM transactions");
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to clear transactions: " + e.getMessage(), e);
+        }
+    }
+
+    private Transaction mapRow(ResultSet rs) throws SQLException {
+        return new Transaction(
+                rs.getString("transaction_id"),
+                TransactionType.valueOf(rs.getString("transaction_type")),
+                rs.getBigDecimal("amount"),
+                rs.getBigDecimal("fee"),
+                rs.getBigDecimal("balance_after"),
+                rs.getString("account_number"),
+                rs.getTimestamp("timestamp").toInstant(),
+                rs.getString("performed_by_employee_id"),
+                rs.getString("performed_by_name"),
+                EmployeeRole.valueOf(rs.getString("performed_by_role"))
+        );
     }
 }

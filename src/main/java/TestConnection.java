@@ -1,8 +1,6 @@
-import com.finance.bank.model.Customer;
-import com.finance.bank.repository.CustomerRepository;
-import com.finance.bank.service.BankService;
+import com.finance.bank.model.*;
 import com.finance.bank.service.AuthenticationService;
-import com.finance.bank.model.Employee;
+import com.finance.bank.service.BankService;
 
 public class TestConnection {
     public static void main(String[] args) {
@@ -14,13 +12,15 @@ public class TestConnection {
             bankService.reset();
 
             Customer customer = bankService.createCustomer(manager, "Ahmed Hassan", "29001011234567");
-            System.out.println("✅ Customer created!");
-            System.out.println("Name: " + customer.getName());
-            System.out.println("ID: " + customer.getSystemId());
-            System.out.println("National ID: " + customer.getNationalId());
+            System.out.println("✅ Customer created: " + customer.getName());
 
-            Customer found = bankService.findCustomerByNationalId("29001011234567");
-            System.out.println("✅ Customer found: " + found.getName());
+            SavingsAccount account = new SavingsAccount("1001000100000001", customer);
+            bankService.openAccount(manager, account);
+            System.out.println("✅ Account created: " + account.getAccountNumber());
+
+            Account found = bankService.findAccountByNumber("1001000100000001");
+            System.out.println("✅ Account found: " + found.getAccountNumber());
+            System.out.println("Balance: " + found.getBalance());
 
         } catch (Exception e) {
             System.out.println("❌ Failed: " + e.getMessage());

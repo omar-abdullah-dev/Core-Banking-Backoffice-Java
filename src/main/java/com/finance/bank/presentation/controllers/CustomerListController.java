@@ -73,8 +73,12 @@ public class CustomerListController implements Initializable, EmployeeAware {
         colNationalId.setCellValueFactory(data ->
                 new SimpleStringProperty(data.getValue().getNationalId()));
 
-        colAccounts.setCellValueFactory(data ->
-                new SimpleIntegerProperty(data.getValue().getAccounts().size()));
+        colAccounts.setCellValueFactory(data ->{
+            long count = bankService.getAccounts().stream()
+                .filter(a -> a.getOwner().getSystemId()
+                        .equals(data.getValue().getSystemId()))
+                .count();
+            return new SimpleIntegerProperty((int) count);});
 
         // Account count badge cell
         colAccounts.setCellFactory(col -> new TableCell<Customer, Number>() {
@@ -147,7 +151,12 @@ public class CustomerListController implements Initializable, EmployeeAware {
                 break;
             case "Most Accounts":
                 sorted = new ArrayList<>(allCustomers);
-                sorted.sort((a, b) -> b.getAccounts().size() - a.getAccounts().size());
+                List<Account> allAcc = bankService.getAccounts();
+                sorted.sort((a, b) -> {
+                    long countA = allAcc.stream().filter(ac -> ac.getOwner().getSystemId().equals(a.getSystemId())).count();
+                    long countB = allAcc.stream().filter(ac -> ac.getOwner().getSystemId().equals(b.getSystemId())).count();
+                    return Long.compare(countB, countA);
+                });
                 break;
             default: // "Name (A-Z)"
                 sorted = new ArrayList<>(allCustomers);
@@ -171,11 +180,15 @@ public class CustomerListController implements Initializable, EmployeeAware {
         StringBuilder sb = new StringBuilder();
         sb.append("System ID   : ").append(customer.getSystemId()).append("\n");
         sb.append("National ID : ").append(customer.getNationalId()).append("\n");
-        sb.append("Accounts    : ").append(customer.getAccounts().size()).append("\n\n");
+        List<Account> customerAccounts = bankService.getAccounts().stream()
+                .filter(a -> a.getOwner().getSystemId().equals(customer.getSystemId()))
+                .toList();
 
-        if (!customer.getAccounts().isEmpty()) {
+        sb.append("Accounts    : ").append(customerAccounts.size()).append("\n\n");
+
+        if (!customerAccounts.isEmpty()) {
             sb.append("Account details:\n");
-            for (Account acc : customer.getAccounts()) {
+            for (Account acc : customerAccounts) {
                 sb.append("  \u2022 ").append(acc.getAccountType().label())
                   .append("  |  ").append(acc.getAccountNumber())
                   .append("  |  EGP ")

@@ -157,7 +157,11 @@ public class TransactionFormController {
             return;
         }
 
-        if (customer.getAccounts().isEmpty()) {
+        customerAccounts = bankService.getAccounts().stream()
+                .filter(a -> a.getOwner().getSystemId().equals(customer.getSystemId()))
+                .collect(java.util.stream.Collectors.toList());
+
+        if (customerAccounts.isEmpty()) {
             showError("Customer \"" + customer.getName() + "\" has no accounts.");
             hideAccountSection();
             selectedCustomer = null;
@@ -166,15 +170,13 @@ public class TransactionFormController {
             return;
         }
 
-        selectedCustomer  = customer;
-        customerAccounts  = new ArrayList<>(customer.getAccounts());
+        selectedCustomer = customer;
 
         foundCustomerName.setText(customer.getName()
                 + "  \u2502  " + customerAccounts.size() + " account(s)");
         customerFoundBox.setVisible(true);
         customerFoundBox.setManaged(true);
 
-        // Build ComboBox items: "Savings — XXXXXXXXXXXXABCD  (EGP 1,000.00)"
         List<String> labels = new ArrayList<>();
         for (Account acc : customerAccounts) {
             labels.add(acc.getAccountType().label()
@@ -191,7 +193,6 @@ public class TransactionFormController {
         balanceBox.setVisible(false);
         balanceBox.setManaged(false);
     }
-
     @FXML
     private void handleAccountSelected() {
         int idx = accountCombo.getSelectionModel().getSelectedIndex();

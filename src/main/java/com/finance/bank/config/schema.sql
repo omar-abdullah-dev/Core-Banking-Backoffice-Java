@@ -31,7 +31,7 @@ CREATE TABLE accounts (
 	created_at TIMESTAMP NOT NULL DEFAULT now(),
 	CONSTRAINT fk_account_customer
         FOREIGN KEY (customer_id) REFERENCES customers(system_id)
-)
+);
 
 CREATE TABLE transactions (
 	transaction_id VARCHAR(50) PRIMARY KEY,

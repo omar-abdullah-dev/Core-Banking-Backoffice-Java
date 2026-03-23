@@ -55,6 +55,7 @@ This project simulates how bank employees manage customers, accounts, and transa
 | **Architecture** | Layered / MVC | - |
 | **Data Storage** | PostgreSQL with JDBC | 15+ |
 | **Connection Pool** | HikariCP | 5.1.0 |
+| **Logging** | SLF4J + Simple Logger | 1.7.36 |
 
 ---
 
@@ -216,45 +217,54 @@ Content:   C  | YY  | MM  | DD  | GOV  | SEQ   | CHECK
 
 ### Architecture & Design
 
-- **PostgreSQL JDBC Migration Plan** — [PostgreSQL_JDBC_Plan.md](docs/PostgreSQL_JDBC_Plan.md) outlines the transition from in-memory data structures to persistent database storage using JDBC
+- **[PostgreSQL JDBC Migration Plan](docs/PostgreSQL_JDBC_Plan.md)** — Comprehensive guide detailing the transition from in-memory data structures to persistent PostgreSQL database storage using JDBC, including schema design, implementation strategy, and migration roadmap
 
 ### Database Persistence Layer
 
 **Recent Transformation (v2.0.0):**
 
-The repository layer has been migrated from in-memory collections to **PostgreSQL database persistence** with JDBC connectivity:
+The entire repository layer has been migrated from in-memory collections to **PostgreSQL database persistence** with JDBC connectivity, while maintaining complete backward compatibility with the service layer:
 
-| Component | Previous | Current |
-|-----------|----------|---------|
-| **CustomerRepository** | `HashMap<String, Customer>` | PostgreSQL via JDBC + HikariCP pooling |
-| **AccountRepository** | `HashMap<String, Account>` | PostgreSQL via JDBC + HikariCP pooling |
-| **TransactionRepository** | `ArrayList<Transaction>` | PostgreSQL via JDBC + HikariCP pooling |
+#### Migration Details
 
-**Benefits of Migration:**
-- ✅ **Data Durability** — Customer, account, and transaction records persist across application restarts
-- ✅ **Concurrent Access** — Multi-session support with proper connection pooling via HikariCP
-- ✅ **Database-Level Constraints** — Unique key enforcement (National ID, account numbers) at the database layer
-- ✅ **Query Flexibility** — JDBC enables advanced filtering, pagination, and reporting capabilities
-- ✅ **Audit Trail** — Transaction history remains intact indefinitely
-- ✅ **Backward Compatibility** — Public repository interfaces remain unchanged; service layer workflows are unaffected
+| Component | Previous Implementation | Current Implementation |
+|-----------|------------------------|------------------------|
+| **CustomerRepository** | `HashMap<String, Customer>` | PostgreSQL via JDBC with HikariCP pooling |
+| **AccountRepository** | `HashMap<String, Account>` | PostgreSQL via JDBC with HikariCP pooling |
+| **TransactionRepository** | `ArrayList<Transaction>` | PostgreSQL via JDBC with HikariCP pooling |
 
-**Database Configuration:**
+#### Key Benefits
+
+- ✅ **Data Durability** — All customer, account, and transaction records persist across application restarts
+- ✅ **Concurrent Access** — Multi-session support with enterprise-grade connection pooling (HikariCP)
+- ✅ **Database Constraints** — Unique key enforcement (National ID, account numbers) enforced at the database layer
+- ✅ **Query Flexibility** — JDBC enables advanced filtering, pagination, sorting, and reporting capabilities
+- ✅ **Audit Trail** — Complete and immutable transaction history maintained indefinitely
+- ✅ **Production-Ready** — ACID transactions, data integrity, and enterprise compliance
+- ✅ **Backward Compatible** — Public repository interfaces remain unchanged; service layer workflows unaffected
+
+#### Database Configuration
+
 Located in `com.finance.bank.config.DatabaseConfig`:
 - **JDBC URL:** `jdbc:postgresql://localhost:5432/finance_bank`
-- **Connection Pool:** HikariCP with max 10 connections, min 2 idle connections
-- **Driver:** PostgreSQL JDBC driver
-- See [DatabaseConfig.java](src/main/java/com/finance/bank/config/DatabaseConfig.java) for details
+- **Connection Pool:** HikariCP (5.1.0)
+  - **Maximum Connections:** 10
+  - **Minimum Idle Connections:** 2
+  - **Connection Timeout:** 30 seconds
+- **Database Driver:** PostgreSQL JDBC Driver (42.7.3)
+- **Logging:** SLF4J + Simple Logger (1.7.36)
 
-**Schema Setup:**
-Refer to the PostgreSQL JDBC Plan documentation for DDL scripts and schema initialization.
+#### Schema & Initialization
+
+Full database schema (DDL scripts, table definitions, constraints, indexes) is documented in the **[PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md)**.
 
 ---
 
 ## 📌 Documentation Index
 
-- [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md) — Database migration and schema design
-- [REFACTORING.md](docs/REFACTORING.md) — Code refactoring notes
-- [Action Plan](docs/Action%20plan.md) — Development roadmap
+- **[PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md)** — Complete migration documentation with schema design, implementation guide, and deployment steps
+- [REFACTORING.md](docs/REFACTORING.md) — Code quality improvements and refactoring notes
+- [Action Plan](docs/Action%20plan.md) — Development roadmap and feature planning
 
 ---
 
@@ -606,14 +616,15 @@ mvn exec:java -Dexec.mainClass="com.finance.bank.app.BankEmployeeCLI"
 
 ## 🔮 Future Improvements
 
-- [x] **Database Persistence** — ✅ Migrated to PostgreSQL with JDBC (v2.0.0) — See [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md)
+- [x] **Database Persistence** — ✅ **COMPLETED (v2.0.0)** — Fully migrated to PostgreSQL with JDBC + HikariCP. See [PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md) for implementation details.
 - [ ] **Password Hashing** — BCrypt encryption for employee credentials
-- [ ] **Spring Boot API** — RESTful web services for mobile/external clients
+- [ ] **Spring Boot Integration** — Migrate to Spring Framework for enhanced features
+- [ ] **RESTful Web API** — Spring Boot REST endpoints for mobile/external clients
 - [ ] **Web Frontend** — React/Angular customer portal
-- [ ] **Microservices** — Service decomposition for scalability
-- [ ] **Logging Framework** — SLF4J + Logback integration
-- [ ] **Docker Support** — Containerization for deployment
-- [ ] **CI/CD Pipeline** — GitHub Actions automated builds and tests
+- [ ] **Microservices Architecture** — Service decomposition for scalability
+- [ ] **Advanced Logging** — Logback configuration with rolling logs and levels
+- [ ] **Docker Containerization** — Dockerfile and docker-compose for deployment
+- [ ] **CI/CD Pipeline** — GitHub Actions for automated builds, tests, and deployments
 
 ---
 

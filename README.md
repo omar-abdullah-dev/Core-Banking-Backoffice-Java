@@ -5,6 +5,7 @@
 ![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk)
 ![JavaFX](https://img.shields.io/badge/JavaFX-21.0.2-blue?style=for-the-badge&logo=openjfx)
 ![JUnit5](https://img.shields.io/badge/JUnit-5.10.1-green?style=for-the-badge&logo=junit5)
+![JDBC](https://img.shields.io/badge/JDBC-API-red?style=for-the-badge&logo=java)
 ![Maven](https://img.shields.io/badge/Maven-3.x-red?style=for-the-badge&logo=apachemaven)
 ![Version](https://img.shields.io/badge/Version-2.0.0-purple?style=for-the-badge)
 

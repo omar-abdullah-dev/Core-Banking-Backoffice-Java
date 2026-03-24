@@ -1,0 +1,6 @@
+db.url=jdbc:postgresql://localhost:5432/finance_bank
+db.username=postgres
+db.password=YOUR_PASSWORD_HERE
+db.pool.maxSize=10
+db.pool.minIdle=2
+db.pool.name=FinanceBankPool

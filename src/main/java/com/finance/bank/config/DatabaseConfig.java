@@ -3,69 +3,84 @@ package com.finance.bank.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
- * DatabaseConfig is a utility class that provides a centralized way to manage database connections using HikariCP connection pooling.
- * It initializes a static HikariDataSource with the specified configuration parameters
- * and provides a method to obtain connections from the pool.
- *
-*/
+ * Provides database connections via HikariCP connection pooling.
+ * Configuration is loaded from database.properties in the classpath.
+ */
+public class DatabaseConfig {
 
-public class DatabaseConfig    {
+    private static volatile HikariDataSource dataSource;
 
-     // Database connection parameters
-
-    private static final HikariDataSource DATA_SOURCE;
-
-    static {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:postgresql://localhost:5432/finance_bank");
-        config.setUsername("postgres");
-        config.setPassword("Moharam@2002");
-        config.setMaximumPoolSize(10);
-        config.setMinimumIdle(2);
-        config.setPoolName("FinanceBankPool");
-        DATA_SOURCE = new HikariDataSource(config);
-    }
     // Private constructor to prevent instantiation
     private DatabaseConfig() {}
 
-    public static Connection getConnection() throws SQLException {
-        return DATA_SOURCE.getConnection();
+    /**
+     * Returns the shared HikariDataSource, initializing it on first call (lazy init).
+     */
+    private static HikariDataSource getDataSource() {
+        if (dataSource == null) {
+            synchronized (DatabaseConfig.class) {
+                if (dataSource == null) {
+                    dataSource = buildDataSource();
+                }
+            }
+        }
+        return dataSource;
     }
-    public static void shutdown() {
-        if (DATA_SOURCE != null && !DATA_SOURCE.isClosed()) {
-            DATA_SOURCE.close();
+
+    private static HikariDataSource buildDataSource() {
+        Properties props = loadProperties();
+
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(props.getProperty("db.url"));
+        config.setUsername(props.getProperty("db.username"));
+        config.setPassword(props.getProperty("db.password"));
+        config.setMaximumPoolSize(Integer.parseInt(props.getProperty("db.pool.maxSize", "10")));
+        config.setMinimumIdle(Integer.parseInt(props.getProperty("db.pool.minIdle", "2")));
+        config.setPoolName(props.getProperty("db.pool.name", "FinanceBankPool"));
+
+        try {
+            return new HikariDataSource(config);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize database connection pool: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * We can also use DriverManager to connect to our database as the standard way to get our database connection.
-     * However, using a connection pool like HikariCP provides several advantages:
-     * 1. Performance: Connection pools maintain a pool of active connections that can be reused,
-     *      reducing the overhead of establishing a new connection for each request.
-     * 2. Resource Management: Connection pools manage the lifecycle of connections,
-     *      ensuring that they are properly closed and returned to the pool after use,
-     *      which helps prevent resource leaks.
-     * 3. Scalability: Connection pools can handle a large number of concurrent requests
-     *                  by efficiently managing the available connections,
-     *                  which is crucial for applications with high traffic.
-     * 4. Configuration: Connection pools offer various configuration options (e.g., maximum pool size, connection timeout)
-     *          that allow fine-tuning of database connectivity based on application needs.
-     * In contrast, using DriverManager directly can lead to performance issues and resource management challenges,
-     *          especially in applications with high concurrency or long-running processes.
-     * */
+    private static Properties loadProperties() {
+        Properties props = new Properties();
+        try (InputStream input = DatabaseConfig.class
+                .getClassLoader()
+                .getResourceAsStream("database.properties")) {
 
-//     Here is how to setup the connection using DriverManager without connection pooling:
-    public static Connection getConnectionWithDriverManager() throws SQLException {
-        String url = "jdbc:postgresql://localhost:5432/finance_bank";
-        String username = "postgres";
-        String password = "Moharam@2002";
-        return DriverManager.getConnection(url, username, password);
+            if (input == null) {
+                throw new RuntimeException("database.properties not found in classpath");
+            }
+            props.load(input);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load database.properties: " + e.getMessage(), e);
+        }
+        return props;
     }
 
-}
+    /**
+     * Returns a connection from the pool.
+     */
+    public static Connection getConnection() throws SQLException {
+        return getDataSource().getConnection();
+    }
 
+    /**
+     * Shuts down the connection pool. Call this on application exit.
+     */
+    public static void shutdown() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+        }
+    }
+}

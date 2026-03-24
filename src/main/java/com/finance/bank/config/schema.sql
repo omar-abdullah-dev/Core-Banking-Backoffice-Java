@@ -1,4 +1,4 @@
-CREATE TYPE emplyee_role_enum AS ENUM ('CS','TELLER','MANAGER');
+CREATE TYPE employee_role_enum AS ENUM ('CS','TELLER','MANAGER');
 CREATE TYPE account_type_enum AS ENUM ('SAVINGS','CURRENT');
 CREATE TYPE transaction_type_enum AS ENUM ('DEPOSIT','WITHDRAWAL','TRANSFER');
 
@@ -7,7 +7,7 @@ CREATE TABLE employees (
 	username VARCHAR (100) UNIQUE NOT NULL ,
 	national_id VARCHAR(14) UNIQUE NOT NULL,
 	password VARCHAR(255) NOT NULL,
-	role emplyee_role_enum NOT NULL ,
+	role employee_role_enum NOT NULL ,
 	email VARCHAR(255) ,
 	phone VARCHAR (20),
 	created_at TIMESTAMP NOT NULL DEFAULT now()
@@ -44,7 +44,7 @@ CREATE TABLE transactions (
 	timestamp TIMESTAMP NOT NULL DEFAULT now(),
 	performed_by_employee_id VARCHAR(50) NOT NULL,
 	performed_by_name  VARCHAR(255) NOT NULL ,
-	performed_by_role emplyee_role_enum NOT NULL,
+	performed_by_role employee_role_enum NOT NULL,
 	CONSTRAINT fk_transaction_account
 		FOREIGN KEY (account_number) REFERENCES accounts(account_number),
 	CONSTRAINT fk_transaction_employee

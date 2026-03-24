@@ -40,7 +40,21 @@ This project simulates how bank employees manage customers, accounts, and transa
 
 ### ATS-Friendly Project Description
 
-**Core Banking Back-Office System (Java, JavaFX)** is a layered enterprise banking application for employee operations, built with **Java 17**, **JavaFX**, **Maven**, and **JUnit 5**. It implements customer onboarding, account lifecycle management, deposits/withdrawals with business-rule validation, role-based access control (RBAC), audit-ready transaction history, and CSV export workflows. The project demonstrates clean OOP design, custom exception handling, test-driven validation of business logic, and maintainable architecture patterns (Facade, Repository, Singleton, MVC) commonly used in production banking software.
+**Core Banking Back-Office System** is an enterprise-grade banking application for employee-assisted operations, built with **Java 17**, **JavaFX 21**, **PostgreSQL 15+**, **JDBC**, **HikariCP**, **Maven**, and **JUnit 5**. It implements:
+
+- **Customer Lifecycle Management** — Account creation with Egyptian National ID validation (14-digit format, birth date extraction, governorate verification)
+- **Account Management** — Dual account types (Savings/Current) with polymorphic withdrawal rules and configurable overdraft limits
+- **Transaction Processing** — Deposits, withdrawals with 1% fee calculation, real-time balance validation, immutable audit trails
+- **Role-Based Access Control (RBAC)** — Three roles (Customer Service, Teller, Manager) with permission enforcement at service layer
+- **Persistent Storage** — PostgreSQL relational database with JDBC connectivity, HikariCP connection pooling (10 max, 2 min idle connections), 30-second timeouts
+- **Dual Interfaces** — CLI (console) and JavaFX Desktop GUI with modern CSS theming, responsive sidebar navigation, real-time fee display
+- **CSV Export System** — Three modes (by customer, all transactions, by account) with incremental append-only exports to `exports/` directory
+- **Comprehensive Testing** — JUnit 5 test suite covering authentication, authorization, customer creation, account operations, transaction processing, exception scenarios
+- **Clean Architecture** — Layered design (Presentation → Service → Repository → Domain) with design patterns (Singleton, Facade, Repository, Strategy, MVC, Observer)
+- **Security Features** — Session management, masked account display, input validation, immutable transactions, complete audit trails
+- **Database Transformation (v2.0.0)** — Migrated from in-memory HashMap/ArrayList to PostgreSQL with JDBC, maintaining full backward compatibility with service layer
+
+The system demonstrates production-quality OOP principles, exception-driven design, enterprise architecture patterns, and ACID-compliant database integration—ideal for fintech, banking systems, and e-commerce transaction platforms.
 
 ---
 
@@ -260,11 +274,9 @@ Full database schema (DDL scripts, table definitions, constraints, indexes) is d
 
 ---
 
-## 📌 Documentation Index
+## 📌 Documentation
 
-- **[PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md)** — Complete migration documentation with schema design, implementation guide, and deployment steps
-- [REFACTORING.md](docs/REFACTORING.md) — Code quality improvements and refactoring notes
-- [Action Plan](docs/Action%20plan.md) — Development roadmap and feature planning
+- **[PostgreSQL JDBC Plan](docs/PostgreSQL_JDBC_Plan.md)** — Complete database migration documentation with schema design, JDBC integration strategy, HikariCP connection pooling configuration, implementation guide, and deployment steps
 
 ---
 
@@ -277,9 +289,7 @@ banking-system/
 ├── README.md                        # This file
 │
 ├── docs/                            # Documentation
-│   └── PostgreSQL_JDBC_Plan.md      # Database migration plan
-|  └── REFACTORING.md                # Code refactoring notes
-|  └── Action plan.md                # Development roadmap
+│   └── PostgreSQL_JDBC_Plan.md      # Database migration & JDBC integration plan
 │
 ├── exports/                         # CSV export output directory
 │   ├── transactions_customer_*.csv

@@ -8,37 +8,23 @@
 
     <groupId>com.finance.bank</groupId>
     <artifactId>core-banking-backoffice-system</artifactId>
-
-    <!-- upgraded version -->
     <version>2.0.0</version>
-
     <name>Finance Bank System (CLI + JavaFX)</name>
 
     <properties>
-
-        <!-- Java -->
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!-- JavaFX -->
         <javafx.version>21.0.2</javafx.version>
-
-        <!-- Testing -->
         <junit.version>5.10.1</junit.version>
-
     </properties>
 
-
-    <!-- ========================= -->
-    <!-- Dependencies -->
-    <!-- ========================= -->
-
+    <!-- ================================================================ -->
+    <!-- Dependencies                                                      -->
+    <!-- ================================================================ -->
     <dependencies>
 
-        <!-- JavaFX -->
-
+        <!-- ── JavaFX ──────────────────────────────────────────────── -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -57,133 +43,118 @@
             <version>${javafx.version}</version>
         </dependency>
 
-
-        <!-- JUnit -->
-
-        <dependency>
-
-            <groupId>org.junit.jupiter</groupId>
-
-            <artifactId>junit-jupiter-api</artifactId>
-
-            <version>${junit.version}</version>
-
-            <scope>test</scope>
-
-        </dependency>
-
-        <!-- PostgreSQL Driver -->
+        <!-- ── Database ────────────────────────────────────────────── -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.3</version>
         </dependency>
 
-        <!-- HikariCP Connection Pool -->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>5.1.0</version>
         </dependency>
 
-        <dependency>
-
-            <groupId>org.junit.jupiter</groupId>
-
-            <artifactId>junit-jupiter-engine</artifactId>
-
-            <version>${junit.version}</version>
-
-            <scope>test</scope>
-
-        </dependency>
-
-        <!-- SLF4J Simple Logger -->
+        <!-- ── Logging ─────────────────────────────────────────────── -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
         </dependency>
 
+        <!-- ── JUnit 5 ──────────────────────────────────────────────── -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
-
-
-    <!-- ========================= -->
-    <!-- Build -->
-    <!-- ========================= -->
-
-
+    <!-- ================================================================ -->
+    <!-- Build                                                             -->
+    <!-- ================================================================ -->
     <build>
-
-
         <plugins>
 
-
-            <!-- Compiler -->
-
+            <!-- ── Compiler ─────────────────────────────────────────── -->
             <plugin>
-
                 <groupId>org.apache.maven.plugins</groupId>
-
                 <artifactId>maven-compiler-plugin</artifactId>
-
                 <version>3.11.0</version>
-
                 <configuration>
-
                     <source>17</source>
-
                     <target>17</target>
-
                     <encoding>UTF-8</encoding>
-
                 </configuration>
-
             </plugin>
 
-
-
-            <!-- JavaFX run plugin -->
-
+            <!-- ── JavaFX run plugin ─────────────────────────────────── -->
             <plugin>
-
                 <groupId>org.openjfx</groupId>
-
                 <artifactId>javafx-maven-plugin</artifactId>
-
                 <version>0.0.8</version>
-
                 <configuration>
-
-                    <mainClass>
-
-                        com.finance.bank.app.MainApp
-
-                    </mainClass>
-
+                    <mainClass>com.finance.bank.app.MainApp</mainClass>
                 </configuration>
-
             </plugin>
 
-
-
-            <!-- Test plugin -->
-
+            <!-- ── Surefire: runs BankingSystemTest (mvn test) ──────── -->
+            <!--
+                Runs:   src/test/java/**/*Test.java
+                Needs:  src/test/resources/database.properties → banking_test
+                Skips:  *IntegrationTest.java  (those run via Failsafe)
+            -->
             <plugin>
-
                 <groupId>org.apache.maven.plugins</groupId>
-
                 <artifactId>maven-surefire-plugin</artifactId>
-
-                <version>3.0.0</version>
-
+                <version>3.2.5</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
+            <!-- ── Failsafe: runs Integration Tests (mvn verify) ────── -->
+            <!--
+                Runs:   *IntegrationTest.java
+                Needs:  src/test/resources/database.properties → banking_test
+                Run:    mvn verify -DskipTests   (integration only)
+                        mvn verify               (unit + integration)
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <includes>
+                        <include>**/*IntegrationTest.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
         </plugins>
-
     </build>
 
 </project>

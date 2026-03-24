@@ -197,11 +197,10 @@ public class AccountRepository {
                     overdraft != null ? overdraft : BigDecimal.ZERO);
         }
 
-        if (balance.compareTo(BigDecimal.ZERO) > 0) {
-            try { account.deposit(balance); }
-            catch (Exception ignored) {}
-        }
+        // Hydrate persisted balance directly (supports negative overdrafts)
+        account.loadPersistedBalance(balance);
 
         return account;
     }
 }
+

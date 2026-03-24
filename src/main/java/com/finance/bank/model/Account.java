@@ -113,6 +113,14 @@ abstract public class Account {
         this.balance = normalizeAmount(newBalance);
     }
 
+    /**
+     * Hydrates balance from persistence (accepts positive or negative values).
+     * Intended for repositories to set stored balances without triggering validation.
+     */
+    public void loadPersistedBalance(BigDecimal persistedBalance) {
+        this.balance = normalizeAmount(persistedBalance);
+    }
+
     // Helper for printing
     public String getTypeName() {
         return accountType.label();

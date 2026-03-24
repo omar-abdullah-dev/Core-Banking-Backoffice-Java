@@ -235,27 +235,78 @@ Content:   C  | YY  | MM  | DD  | GOV  | SEQ   | CHECK
 
 ### Database Persistence Layer
 
-**Recent Transformation (v2.0.0):**
+#### Transformation from In-Memory to PostgreSQL (v2.0.0)
 
-The entire repository layer has been migrated from in-memory collections to **PostgreSQL database persistence** with JDBC connectivity, while maintaining complete backward compatibility with the service layer:
+**Overview:**
 
-#### Migration Details
+The system evolved from a prototype in-memory architecture to production-grade database persistence without breaking changes to the service and presentation layers. This demonstrates the power of clean architecture and the Repository pattern.
 
-| Component | Previous Implementation | Current Implementation |
-|-----------|------------------------|------------------------|
-| **CustomerRepository** | `HashMap<String, Customer>` | PostgreSQL via JDBC with HikariCP pooling |
-| **AccountRepository** | `HashMap<String, Account>` | PostgreSQL via JDBC with HikariCP pooling |
-| **TransactionRepository** | `ArrayList<Transaction>` | PostgreSQL via JDBC with HikariCP pooling |
+**Phase 1: In-Memory Prototype (v1.0.0)**
+```
+Presentation Layer → Service Layer → Repository Layer (Collections)
+                                     ├── HashMap<String, Customer>
+                                     ├── HashMap<String, Account>
+                                     └── ArrayList<Transaction>
+                                     (Lost on restart)
+```
 
-#### Key Benefits
+**Phase 2: PostgreSQL Persistence (v2.0.0)** ✅ **CURRENT**
+```
+Presentation Layer → Service Layer → Repository Layer (JDBC)
+                                     ├── PostgreSQL + JDBC + HikariCP
+                                     ├── Connection Pooling (10 max connections)
+                                     ├── Full ACID Compliance
+                                     └── Data Persistence (Permanent)
+```
+
+**Key Architecture Decision:** Only the Repository Layer implementation changed. The Service Layer interfaces remained identical, ensuring zero impact on business logic, controllers, and views.
+
+#### Migration Implementation
+
+| Aspect | In-Memory (v1.0) | PostgreSQL (v2.0) | Benefit |
+|--------|------------------|-------------------|---------|
+| **Storage** | JVM Heap (HashMap/ArrayList) | PostgreSQL 15+ | Durability & Scalability |
+| **Connection** | N/A | JDBC + HikariCP | Thread-safe pooling |
+| **Constraints** | Java validation only | Database + Java | Data integrity enforcement |
+| **Concurrency** | Not thread-safe | ACID transactions | Safe multi-session access |
+| **Queries** | Manual iteration (O(n)) | SQL with indexes | Fast lookups & filtering |
+| **Audit Trail** | Volatile, in-memory | Permanent, timestamped | Complete compliance |
+| **Scalability** | Limited by RAM | Scales to millions | Enterprise-grade |
+
+#### Repository Layer Architecture
+
+```java
+// PUBLIC INTERFACE (Unchanged)
+public interface ICustomerRepository {
+    void save(Customer customer) throws DuplicateNationalIdException;
+    Customer findBySystemId(String systemId);
+    Customer findByNationalId(String nationalId);
+    // ... unchanged methods
+}
+
+// v1.0 IMPLEMENTATION
+public class CustomerRepository implements ICustomerRepository {
+    private static final Map<String, Customer> customers = new HashMap<>();
+    // HashMap-based storage
+}
+
+// v2.0 IMPLEMENTATION
+public class CustomerRepository implements ICustomerRepository {
+    private static final HikariDataSource dataSource = setupPooling();
+    // JDBC-based storage with same public interface
+}
+```
+
+**Key Benefits**
 
 - ✅ **Data Durability** — All customer, account, and transaction records persist across application restarts
-- ✅ **Concurrent Access** — Multi-session support with enterprise-grade connection pooling (HikariCP)
+- ✅ **Concurrent Access** — Multi-session support with enterprise-grade connection pooling (HikariCP 5.1.0)
 - ✅ **Database Constraints** — Unique key enforcement (National ID, account numbers) enforced at the database layer
 - ✅ **Query Flexibility** — JDBC enables advanced filtering, pagination, sorting, and reporting capabilities
-- ✅ **Audit Trail** — Complete and immutable transaction history maintained indefinitely
+- ✅ **Audit Trail** — Complete and immutable transaction history maintained indefinitely with timestamps
 - ✅ **Production-Ready** — ACID transactions, data integrity, and enterprise compliance
-- ✅ **Backward Compatible** — Public repository interfaces remain unchanged; service layer workflows unaffected
+- ✅ **Backward Compatible** — Zero changes to public repository interfaces; service layer workflows unaffected
+- ✅ **Zero Service Layer Changes** — Business logic, validation, and workflows remain unchanged
 
 #### Database Configuration
 

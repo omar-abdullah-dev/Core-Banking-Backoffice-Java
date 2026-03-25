@@ -7,9 +7,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repository for managing transactions in the database.
+ * Provides methods to save transactions and query them by account number or get all transactions.
+ */
 public class TransactionRepository {
 
     public void save(Transaction tx) {
+        // prepared statement for inserting a new transaction, with explicit casting for enum types and handling of all transaction fields
         String sql = """
                 INSERT INTO transactions (
                     transaction_id, account_number, transaction_type,
@@ -40,6 +45,7 @@ public class TransactionRepository {
     }
 
     public List<Transaction> findByAccountNumber(String accountNumber) {
+        // prepared statement for selecting transactions by account number, ordered by timestamp, and mapping result set to Transaction objects
         String sql = """
                 SELECT transaction_id, account_number, transaction_type,
                        amount, fee, total, balance_after, timestamp,
@@ -67,6 +73,7 @@ public class TransactionRepository {
     }
 
     public List<Transaction> findAll() {
+        // prepared statement for selecting all transactions, ordered by timestamp, and mapping result set to Transaction objects
         String sql = """
                 SELECT transaction_id, account_number, transaction_type,
                        amount, fee, total, balance_after, timestamp,
@@ -90,6 +97,7 @@ public class TransactionRepository {
     }
 
     public int count() {
+        // prepared statement for counting total number of transactions in the database
         String sql = "SELECT COUNT(*) FROM transactions";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -106,6 +114,7 @@ public class TransactionRepository {
     }
 
     public int countByAccount(String accountNumber) {
+        // prepared statement for counting number of transactions for a specific account number
         String sql = "SELECT COUNT(*) FROM transactions WHERE account_number = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -124,6 +133,8 @@ public class TransactionRepository {
     }
 
     public void clear() {
+        // statement to delete all transactions from the database, without affecting accounts or customers
+        // prepared statement not needed in this case
         try (Connection conn = DatabaseConfig.getConnection();
              Statement st = conn.createStatement()) {
             st.executeUpdate("DELETE FROM transactions");
@@ -131,7 +142,7 @@ public class TransactionRepository {
             throw new RuntimeException("Failed to clear transactions: " + e.getMessage(), e);
         }
     }
-
+//    mapping method to convert a ResultSet row into a Transaction object, handling all fields and enum conversions
     private Transaction mapRow(ResultSet rs) throws SQLException {
         return new Transaction(
                 rs.getString("transaction_id"),

@@ -61,7 +61,7 @@ public class CustomerRepository {
 
     public Customer findByNationalId(String nationalId) {
         if (nationalId == null) return null;
-
+        // prepared statement for retrieving a customer by their national ID, with mapping of result set to Customer object
         String sql = "SELECT system_id, name, national_id, email, phone FROM customers WHERE national_id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -80,6 +80,7 @@ public class CustomerRepository {
     }
 
     public Customer findBySystemId(String systemId) {
+        // prepared statement for retrieving a customer by their system ID, with mapping of result set to Customer object
         String sql = "SELECT system_id, name, national_id, email, phone FROM customers WHERE system_id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -98,6 +99,8 @@ public class CustomerRepository {
     }
 
     public boolean existsByNationalId(String nationalId) {
+        if (nationalId == null) return false;
+        // prepared statement for checking if a customer exists by their national ID, returning true if a record is found
         String sql = "SELECT 1 FROM customers WHERE national_id = ?";
 
         try (Connection conn = DatabaseConfig.getConnection();
@@ -114,6 +117,7 @@ public class CustomerRepository {
     }
 
     public List<Customer> findAll() {
+        // prepared statement for retrieving all customers, ordered by name, and mapping result set to a list of Customer objects
         String sql = "SELECT system_id, name, national_id, email, phone FROM customers ORDER BY name";
 
         List<Customer> result = new ArrayList<>();
@@ -132,6 +136,8 @@ public class CustomerRepository {
     }
 
     public void clear() {
+        // execute SQL statements to delete all records from transactions, accounts, and customers tables, ensuring proper order to maintain referential integrity
+        // no need to prepared statement in this case
         try (Connection conn = DatabaseConfig.getConnection();
              Statement st = conn.createStatement()) {
             st.executeUpdate("DELETE FROM transactions");
@@ -141,7 +147,7 @@ public class CustomerRepository {
             throw new RuntimeException("Failed to clear data: " + e.getMessage(), e);
         }
     }
-
+    // mapping method to convert a ResultSet row into a Customer object, extracting system_id, name, national_id, email, and phone fields
     private Customer mapRow(ResultSet rs) throws SQLException {
         return new Customer(
                 rs.getString("system_id"),

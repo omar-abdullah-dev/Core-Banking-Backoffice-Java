@@ -168,6 +168,8 @@ public class AccountRepository {
     }
 
     public void clear() {
+        // simple statement to delete all records from accounts and transactions tables, ensuring referential integrity by deleting transactions first
+        // no need to prepared statement in this case
         try (Connection conn = DatabaseConfig.getConnection();
              Statement st = conn.createStatement()) {
             st.executeUpdate("DELETE FROM transactions");
@@ -176,7 +178,8 @@ public class AccountRepository {
             throw new RuntimeException("Failed to clear accounts: " + e.getMessage(), e);
         }
     }
-
+    // mapping method to convert a ResultSet row into an Account object, handling both savings and current account types,
+    // and associating the account with its owner (customer)
     private Account mapRow(ResultSet rs) throws SQLException, InvalidAccountException {
         String accountNumber = rs.getString("account_number");
         String typeStr       = rs.getString("account_type");
@@ -197,7 +200,7 @@ public class AccountRepository {
                     overdraft != null ? overdraft : BigDecimal.ZERO);
         }
 
-        // Hydrate persisted balance directly (supports negative overdrafts)
+        // to support negative overdrafts
         account.loadPersistedBalance(balance);
 
         return account;

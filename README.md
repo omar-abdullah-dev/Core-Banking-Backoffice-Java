@@ -38,7 +38,7 @@ This project simulates how bank employees manage customers, accounts, and transa
 > ⚠️ **Scope Notice:** This system represents **employee-assisted banking operations only**.
 > No customer self-service, online banking, or external transfers.
 
-### ATS-Friendly Project Description
+### Project Description
 
 **Core Banking Back-Office System** is an enterprise-grade banking application for employee-assisted operations, built with **Java 17**, **JavaFX 21**, **PostgreSQL 15+**, **JDBC**, **HikariCP**, **Maven**, and **JUnit 5**. It implements:
 

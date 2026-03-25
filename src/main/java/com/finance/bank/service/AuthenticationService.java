@@ -18,7 +18,7 @@ public class AuthenticationService {
         }
 
         username = username.trim();
-
+        // prepared statement for selecting an employee by username and password, with case-sensitive matching
         String sql = """
                 SELECT system_id, username, national_id, password, role, email, phone
                 FROM employees

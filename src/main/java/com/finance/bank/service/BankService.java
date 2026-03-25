@@ -139,7 +139,7 @@ public class BankService {
         }
 
         // Persist account and attach to customer
-        // Note: save() may throw DuplicateAccountException but we already checked above
+        // Note: save() may throw DuplicateAccountException, but we already checked above
         accountRepository.save(account);
         owner.addAccount(account);
     }

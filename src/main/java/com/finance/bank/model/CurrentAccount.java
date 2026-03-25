@@ -34,7 +34,7 @@ public class CurrentAccount extends Account{
 
         // Calculate withdrawal fee and resulting balance, validating against overdraft limit
         // State mutation only (no transaction creation here)
-        this.balance = getResultingBalance(amount);;
+        setBalance(getResultingBalance(amount));
     }
 
     private BigDecimal getResultingBalance(BigDecimal amount) throws InsufficientAmountException {

@@ -23,7 +23,12 @@
 
 ## 📋 Overview
 
-A comprehensive **Banking Employee Back-Office System** implemented in Java, designed using clean **Object-Oriented Programming (OOP)** principles and a **layered architecture**. The system features strong validation, custom exception handling, audit logging, automated testing, CSV export, and a full JavaFX Desktop GUI.
+A comprehensive **Banking Employee Back-Office System** implemented in Java, designed using clean **Object-Oriented Programming (OOP)** principles and a **layered architecture**. The system features strong validation, custom exception handling, audit logging, automated testing, CSV export, and a full JavaFX Desktop GUI. **v2.0.0** completes the migration from in-memory repositories to PostgreSQL via JDBC/HikariCP while keeping the service and presentation layers stable (see `docs/PostgreSQL_JDBC_Plan.md`).
+
+### ATS-Friendly Project Snapshot
+- Title: Core Banking Back-Office System — Java 17, JavaFX 21, PostgreSQL 15+, JDBC/HikariCP, Maven, JUnit 5
+- Highlights: RBAC-secured services, dual CLI/JavaFX interfaces, immutable audit-grade transactions with CSV export, and ACID-compliant persistence replacing in-memory stores
+- Outcomes: 60+ automated tests (unit + integration), documented JDBC migration plan, ready for fintech/back-office ATS keyword matching
 
 This project simulates how bank employees manage customers, accounts, and transactions through:
 
@@ -231,7 +236,7 @@ Content:   C  | YY  | MM  | DD  | GOV  | SEQ   | CHECK
 
 ### Architecture & Design
 
-- **[PostgreSQL JDBC Migration Plan](docs/PostgreSQL_JDBC_Plan.md)** — Comprehensive guide detailing the transition from in-memory data structures to persistent PostgreSQL database storage using JDBC, including schema design, implementation strategy, and migration roadmap
+- **[PostgreSQL JDBC Migration Plan](docs/PostgreSQL_JDBC_Plan.md)** — Markdown source of record for the migration from in-memory data structures to PostgreSQL via JDBC (supersedes any prior docx drafts)
 
 ### Database Persistence Layer
 

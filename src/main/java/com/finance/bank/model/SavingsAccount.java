@@ -31,7 +31,7 @@ public class SavingsAccount extends Account {
         }
 
         // State mutation only
-        this.balance = this.balance.subtract(total);
+        setBalance(this.balance.subtract(total));
     }
 
 

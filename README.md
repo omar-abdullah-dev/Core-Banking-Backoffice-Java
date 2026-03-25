@@ -25,10 +25,10 @@
 
 A comprehensive **Banking Employee Back-Office System** implemented in Java, designed using clean **Object-Oriented Programming (OOP)** principles and a **layered architecture**. The system features strong validation, custom exception handling, audit logging, automated testing, CSV export, and a full JavaFX Desktop GUI. **v2.0.0** completes the migration from in-memory repositories to PostgreSQL via JDBC/HikariCP while keeping the service and presentation layers stable (see `docs/PostgreSQL_JDBC_Plan.md`).
 
-### ATS-Friendly Project Snapshot
+### Project Snapshot
 - Title: Core Banking Back-Office System — Java 17, JavaFX 21, PostgreSQL 15+, JDBC/HikariCP, Maven, JUnit 5
 - Highlights: RBAC-secured services, dual CLI/JavaFX interfaces, immutable audit-grade transactions with CSV export, and ACID-compliant persistence replacing in-memory stores
-- Outcomes: 60+ automated tests (unit + integration), documented JDBC migration plan, ready for fintech/back-office ATS keyword matching
+- Outcomes: 57 automated tests passing (unit + integration), documented JDBC migration plan, ready for fintech/back-office ATS keyword matching
 
 This project simulates how bank employees manage customers, accounts, and transactions through:
 
@@ -54,7 +54,7 @@ This project simulates how bank employees manage customers, accounts, and transa
 - **Persistent Storage** — PostgreSQL relational database with JDBC connectivity, HikariCP connection pooling (10 max, 2 min idle connections), 30-second timeouts
 - **Dual Interfaces** — CLI (console) and JavaFX Desktop GUI with modern CSS theming, responsive sidebar navigation, real-time fee display
 - **CSV Export System** — Three modes (by customer, all transactions, by account) with incremental append-only exports to `exports/` directory
-- **Comprehensive Testing** — JUnit 5 test suite covering authentication, authorization, customer creation, account operations, transaction processing, exception scenarios
+- **Comprehensive Testing** — JUnit 5 suite with 57 passing automated tests covering authentication, authorization, customer creation, account operations, transaction processing, and exception scenarios
 - **Clean Architecture** — Layered design (Presentation → Service → Repository → Domain) with design patterns (Singleton, Facade, Repository, Strategy, MVC, Observer)
 - **Security Features** — Session management, masked account display, input validation, immutable transactions, complete audit trails
 - **Database Transformation (v2.0.0)** — Migrated from in-memory HashMap/ArrayList to PostgreSQL with JDBC, maintaining full backward compatibility with service layer
@@ -673,7 +673,7 @@ mvn exec:java -Dexec.mainClass="com.finance.bank.app.BankEmployeeCLI"
 |-----------|--------|
 | CLI Application | ✅ Complete |
 | JavaFX GUI | ✅ Complete |
-| Unit Tests | ✅ Complete |
+| Automated Tests | ✅ 57 Passing |
 | CSV Export | ✅ Complete |
 | Documentation | ✅ Complete |
 | Code Quality | ✅ Production-Ready |

@@ -25,6 +25,13 @@
 
 A comprehensive **Banking Employee Back-Office System** implemented in Java, designed using clean **Object-Oriented Programming (OOP)** principles and a **layered architecture**. The system features strong validation, custom exception handling, audit logging, automated testing, CSV export, and a full JavaFX Desktop GUI. **v2.0.0** completes the migration from in-memory repositories to PostgreSQL via JDBC/HikariCP while keeping the service and presentation layers stable (see `docs/PostgreSQL_JDBC_Plan.md`).
 
+### Latest Updates
+
+- Migrated the data layer from in-memory `HashMap`/`ArrayList` storage to PostgreSQL persistence through JDBC and HikariCP.
+- Added externalized database configuration in `src/main/resources/database.properties` and matching test configuration in `src/test/database.properties`.
+- Expanded automated coverage with integration tests for authentication, accounts, customers, transactions, and end-to-end banking workflows.
+- Standardized monetary values and balances to display consistently in decimal format across the UI, services, and reports.
+
 ### Project Snapshot
 - Title: Core Banking Back-Office System — Java 17, JavaFX 21, PostgreSQL 15+, JDBC/HikariCP, Maven, JUnit 5
 - Highlights: RBAC-secured services, dual CLI/JavaFX interfaces, immutable audit-grade transactions with CSV export, and ACID-compliant persistence replacing in-memory stores
@@ -98,7 +105,7 @@ The system demonstrates production-quality OOP principles, exception-driven desi
 - Create customers with **Egyptian National ID validation**
 - Comprehensive National ID validation:
   - 14-digit format validation
-  - Birth date extraction and validation
+  - Birthdate extraction and validation
   - Governorate code verification (35 valid codes)
   - Century detection (2xxx = 1900s, 3xxx = 2000s)
 - Prevent duplicate customers (unique National ID)
@@ -441,8 +448,14 @@ banking-system/
 │   │       └── css/
 │   │           └── bank-theme.css   # Custom Theme
 │   │
-│   └── test/java/com/finance/bank/test/
-│       └── BankingSystemTest.java   # JUnit 5 Tests
+│   └── test/java/com/finance/bank/
+│       ├── test/BankingSystemTest.java          # Unit / regression tests
+│       └── integration/                         # Database-backed integration tests
+│           ├── AccountIntegrationTest.java
+│           ├── AuthenticationIntegrationTest.java
+│           ├── BankingStoryIntegrationTest.java
+│           ├── CustomerIntegrationTest.java
+│           └── TransactionIntegrationTest.java
 │
 └── target/                          # Build output
     └── banking-system-2.0.0.jar
@@ -569,12 +582,9 @@ Complete console-based workflow:
 
 | Category | Tests |
 |----------|-------|
-| **Authentication** | Login success/failure, invalid credentials |
-| **Authorization** | Role-based access, permission denied |
-| **Customer** | Creation, validation, duplicates |
-| **Account** | Opening, validation, types |
-| **Transactions** | Deposit, withdraw, fees, overdraft |
-| **Exceptions** | All custom exception scenarios |
+| **Unit Tests** | Authentication, authorization, customer, account, transaction, and exception scenarios |
+| **Integration Tests** | End-to-end database-backed account, authentication, customer, transaction, and banking workflow coverage |
+| **Regression Checks** | Balance normalization, fee calculation, overdraft handling, and CSV export consistency |
 
 ### Running Tests
 
@@ -673,7 +683,7 @@ mvn exec:java -Dexec.mainClass="com.finance.bank.app.BankEmployeeCLI"
 |-----------|--------|
 | CLI Application | ✅ Complete |
 | JavaFX GUI | ✅ Complete |
-| Automated Tests | ✅ 57 Passing |
+| Automated Tests | ✅ 57 Passing (unit + integration) |
 | CSV Export | ✅ Complete |
 | Documentation | ✅ Complete |
 | Code Quality | ✅ Production-Ready |

@@ -5,7 +5,7 @@ import com.finance.bank.model.*;
 import com.finance.bank.repository.AccountRepository;
 
 import java.math.BigDecimal;
-
+// Service class responsible for account-related operations, including creation and retrieval.
 public class AccountService {
     private final AuthorizationService authorizationService;
     private final AccountRepository accountRepository;
@@ -24,6 +24,7 @@ public class AccountService {
      * @param owner Customer who owns the account
      * @param overdraftLimit Overdraft limit (only for CURRENT accounts)
      * @return Created account
+     * Thrown Exceptions:
      * @throws UnauthorizedException if employee lacks permission
      * @throws DuplicateAccountException if account number already exists
      * @throws InvalidAccountException if account data is invalid

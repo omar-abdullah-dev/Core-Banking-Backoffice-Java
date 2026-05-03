@@ -21,6 +21,13 @@ public class AccountRepository {
 
     public void save(Account account) throws DuplicateAccountException {
         // prepared statement for inserting a new account, with conditional handling for overdraft limit based on account type
+//        what :: stands for?
+//          In SQL, the "::" operator is used for type casting.
+//          It allows you to explicitly convert a value from one data type to another.
+//          In the context of the provided SQL statement,
+//          "?::account_type_enum" means that the parameter being set will be cast to the "account_type_enum" data type
+//          defined in the database. This is necessary when inserting values into a column that expects a specific enum type,
+//          ensuring that the value is correctly interpreted as that enum rather than a generic string or other data type.
         String sql = """
                 INSERT INTO accounts (account_number, account_type, balance, overdraft_limit, customer_id)
                 VALUES (?, ?::account_type_enum, ?, ?, ?)

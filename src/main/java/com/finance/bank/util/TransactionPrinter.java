@@ -145,10 +145,6 @@ public final class TransactionPrinter {
         return name.replaceAll("[^a-zA-Z0-9]", "_").toLowerCase();
     }
 
-    /**
-     * @deprecated Use exportByAccount, exportByCustomer, or exportAllTransactions instead
-     */
-    @Deprecated
     public static void exportNewTransactions(String accountNumber, List<Transaction> transactions) {
         exportByAccount(accountNumber, transactions);
     }

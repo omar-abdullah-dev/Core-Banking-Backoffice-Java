@@ -20,9 +20,13 @@ import java.util.Properties;
  *                 DriverManager creates a new connection every time, which is costly.
  * 2. Resource Management: HikariCP manages a pool of connections, allowing for reuse and efficient handling of concurrent requests.
  *                         DriverManager does not provide pooling, leading to potential resource exhaustion under load.
- * 3. Configuration: HikariCP offers extensive configuration options for tuning performance, such as connection timeout, pool size, and leak detection. DriverManager has no such capabilities.
- * 4. Reliability: HikariCP includes features like connection validation and automatic recovery from connection failures, improving the robustness of the application. DriverManager does not handle these scenarios, which can lead to application instability.
- * 5. Scalability: HikariCP is designed to scale with the application's needs, making it suitable for production environments. DriverManager is more suitable for simple applications or testing scenarios where connection pooling is not required.
+ * 3. Configuration: HikariCP offers extensive configuration options for tuning performance, such as connection timeout,
+ *                      pool size, and leak detection. DriverManager has no such capabilities.
+ * 4. Reliability: HikariCP includes features like connection validation and automatic recovery from connection failures,
+ *                  improving the robustness of the application. DriverManager does not handle these scenarios,
+ *                  which can lead to application instability.
+ * 5. Scalability: HikariCP is designed to scale with the application's needs, making it suitable for production environments.
+ *                  DriverManager is more suitable for simple applications or testing scenarios where connection pooling is not required.
  * */
 public class DatabaseConfig {
 

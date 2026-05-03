@@ -37,7 +37,7 @@ public class TransactionView {
      * @param employee Currently logged-in employee
      */
     public void handleDeposit(Employee employee) {
-        if (!validateEmployeeLogin(employee)) {
+        if (validateEmployeeLogin(employee)) {
             return;
         }
 
@@ -64,7 +64,7 @@ public class TransactionView {
      * @param employee Currently logged-in employee
      */
     public void handleWithdraw(Employee employee) {
-        if (!validateEmployeeLogin(employee)) {
+        if (validateEmployeeLogin(employee)) {
             return;
         }
 
@@ -90,55 +90,50 @@ public class TransactionView {
      * Displays transaction history for a selected account
      */
     public void handleTransactionHistory() {
-        Customer customer = customerView.findCustomerByNationalId();
-        if (customer == null) {
-            return;
-        }
-
-        Account account = accountView.chooseAccountFromCustomer(customer);
-        if (account == null) {
-            return;
-        }
-
-        List<Transaction> transactions = bankService.getTransactionsByAccount(account.getAccountNumber());
-        
-        if (transactions.isEmpty()) {
-            System.out.println("[!] No transactions found.");
-            return;
-        }
-
-        displayTransactionHistory(account, transactions);
+    Account account = getSelectedAccount();
+    if (account == null) {
+        return;
     }
 
-    /**
-     * Exports transaction history to CSV file
-     */
-    public void handleExportTransactions() {
-        Customer customer = customerView.findCustomerByNationalId();
-        if (customer == null) {
-            return;
-        }
-
-        Account account = accountView.chooseAccountFromCustomer(customer);
-        if (account == null) {
-            return;
-        }
-
-        List<Transaction> transactions = bankService.getTransactionsByAccount(account.getAccountNumber());
-
-        if (transactions.isEmpty()) {
-            System.out.println("[!] No transactions to export.");
-            return;
-        }
-
-        try {
-            TransactionPrinter.exportNewTransactions(account.getAccountNumber(), transactions);
-            System.out.println("✓ Transactions exported successfully");
-        } catch (Exception e) {
-            displayError("Export failed: " + e.getMessage());
-        }
+    List<Transaction> transactions = bankService.getTransactionsByAccount(account.getAccountNumber());
+    if (transactions.isEmpty()) {
+        System.out.println("[!] No transactions found.");
+        return;
     }
 
+    displayTransactionHistory(account, transactions);
+}
+
+/**
+ * Exports transaction history to CSV file
+ */
+public void handleExportTransactions() {
+    Account account = getSelectedAccount();
+    if (account == null) {
+        return;
+    }
+
+    List<Transaction> transactions = bankService.getTransactionsByAccount(account.getAccountNumber());
+    if (transactions.isEmpty()) {
+        System.out.println("[!] No transactions to export.");
+        return;
+    }
+
+    try {
+        TransactionPrinter.exportNewTransactions(account.getAccountNumber(), transactions);
+        System.out.println("✓ Transactions exported successfully");
+    } catch (Exception e) {
+        displayError("Export failed: " + e.getMessage());
+    }
+}
+
+private Account getSelectedAccount() {
+    Customer customer = customerView.findCustomerByNationalId();
+    if (customer == null) {
+        return null;
+    }
+    return accountView.chooseAccountFromCustomer(customer);
+}
     private Account getValidatedAccount() {
         Customer customer = customerView.findCustomerByNationalId();
         if (customer == null) {
@@ -183,8 +178,8 @@ public class TransactionView {
     private boolean validateEmployeeLogin(Employee employee) {
         if (employee == null) {
             System.out.println("[!] Please login first");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }
